@@ -1,0 +1,218 @@
+* {
+  box-sizing: border-box;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.menu {
+  display: flex;
+  gap: 20px;
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &__place {
+    display: inline-grid;
+    background-color: beige;
+    grid-template-areas:
+      "empty top"
+      "left body";
+  }
+
+  &__top {
+    grid-area: top;
+  }
+
+  &__left {
+    grid-area: left;
+  }
+
+  &__body {
+    grid-area: body;
+    border: 2px solid $color-border;
+  }
+
+  &__cells {
+    display: flex;
+
+    &-border {
+      border-bottom: 1px solid $color-border;
+    }
+  }
+
+  &__cell {
+    position: relative;
+    cursor: pointer;
+    border: 0.5px solid $color-border;
+    background-color: $bcg-light;
+    width: 20px;
+    height: 20px;
+    transition: background-color 0.3s;
+
+    &-border {
+      border-right: 2px solid $color-border;
+    }
+
+    &-fill {
+      background-color: $bgc-dark;
+    }
+
+    &-cross {
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        background-color: $bgc-dark;
+      }
+
+      &::before {
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+
+      &::after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
+    }
+  }
+}
+
+.select {
+  position: relative;
+  background-color: $bcg-light;
+  width: 300px;
+  z-index: 99;
+
+  &__header {
+    cursor: pointer;
+    display: flex;
+    border: 1px solid #ccc;
+  }
+
+  &__current {
+    font-size: 18px;
+    line-height: 24px;
+    padding: 8px;
+  }
+
+  &__body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    max-height: 300px;
+    overflow-y: scroll;
+    background-color: $bcg-light;
+    border: 1px solid #cccccc;
+    border-top: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: $bcg-light;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: $bgc-dark;
+    }
+
+    &--show {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  &__option {
+    cursor: pointer;
+    padding: 8px;
+    font-size: 16px;
+    line-height: 24px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: lighten($bgc-dark, $amount: 90);
+    }
+
+    &--inactive {
+      cursor: inherit;
+      background-color: lighten($bgc-dark, $amount: 70);
+
+      &:hover {
+        background-color: lighten($bgc-dark, $amount: 70);
+      }
+    }
+
+    &-current {
+      cursor: inherit;
+      user-select: none;
+      background-color: lighten($bgc-dark, $amount: 80);
+      &:hover {
+        background-color: lighten($bgc-dark, $amount: 80);
+      }
+    }
+  }
+}
+
+.clues {
+  &__top {
+    display: flex;
+    flex-direction: row;
+
+    &-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    &-num {
+      width: 20.5px;
+      height: 20.5px;
+      text-align: center;
+    }
+  }
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    justify-content: center;
+    height: 100%;
+
+    &-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &-num {
+      width: 20.5px;
+      height: 20.5px;
+      text-align: center;
+
+    }
+  }
+}
