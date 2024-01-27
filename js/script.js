@@ -4,6 +4,15 @@ let nonogramSize = 5;
 let nonogramName = "cup";
 let BODY = null;
 
+let TIMER = null;
+let TIMER_RUN = false;
+
+let SAVE_BUTTON = null;
+let RANDOM_GAME_BUTTON = null;
+let CONTINUE_GAME_BUTTON = null;
+let RESET_GAME_BUTTON = null;
+let SOLUTION_BUTTON = null;
+
 sessionStorage.setItem("nonogramSize", 0);
 sessionStorage.setItem("nonogramName", "cup");
 
@@ -94,14 +103,102 @@ class Button {
   }
 }
 
+class Timer {
+  constructor(hoursElem, minutesElem, secondsElem, hours, minutes, seconds) {
+    this.hoursElem = hoursElem;
+    this.minutesElem = minutesElem;
+    this.secondsElem = secondsElem;
+    this.hours = hours;
+    this.minutes = minutes;
+    this.seconds = seconds;
+  }
+
+  reset() {
+    this.hours = 0;
+    this.minutes = 0;
+    this.seconds = 0;
+    this.hoursElem.textContent = `0${this.hours}:`;
+    this.minutesElem.textContent = `0${this.minutes}:`;
+    this.secondsElem.textContent = `0${this.seconds}`;
+  }
+
+  start() {
+    if (this.hours < 9) {
+      this.hoursElem.textContent = `0${this.hours}:`;
+    } else {
+      this.hoursElem.textContent = `${this.hours}:`;
+    }
+    if (this.minutes < 9) {
+      this.minutesElem.textContent = `0${this.minutes}:`;
+    } else {
+      this.minutesElem.textContent = `${this.minutes}:`;
+    }
+    if (this.seconds < 9) {
+      this.secondsElem.textContent = `0${this.seconds}`;
+    } else {
+      this.secondsElem.textContent = this.seconds;
+    }
+
+    this.timer = setInterval(() => {
+      this.update();
+    }, 1000);
+  }
+
+  update() {
+    this.seconds++;
+    if (this.seconds < 9) {
+      this.secondsElem.textContent = `0${this.seconds}`;
+    }
+
+    if (this.seconds > 9) {
+      this.secondsElem.textContent = this.seconds;
+    }
+
+    if (this.seconds >= 59) {
+      this.minutes++;
+      this.seconds = 0;
+      this.secondsElem.textContent = `0${this.seconds}`;
+    }
+
+    if (this.minutes < 9) {
+      this.minutesElem.textContent = `0${this.minutes}:`;
+    }
+    if (this.minutes > 9) {
+      this.minutesElem.textContent = `${this.minutes}:`;
+    }
+
+    if (this.minutes >= 59) {
+      this.hours++;
+      this.minutes = 0;
+      this.hoursElem.textContent = `${this.hours}:`;
+    }
+
+    if (this.hours < 9) {
+      this.hoursElem.textContent = `0${this.hours}:`;
+    }
+    if (this.hours > 9) {
+      this.hoursElem.textContent = `${this.hours}:`;
+    }
+
+    if (this.hours >= 99) {
+      this.stop();
+    }
+  }
+
+  stop() {
+    clearInterval(this.timer);
+  }
+}
+
 function checkWin(matrix, currentPlace) {
   if (matrix.toString() === currentPlace.toString()) {
-    console.log(1);
-    BODY.removeEventListener("mousedown", pickHandler);
+    console.log("Win");
+    BODY.removeEventListener("click", pickHandler);
     BODY.removeEventListener("contextmenu", pickHandler);
     BODY.addEventListener("contextmenu", (e) => {
       e.preventDefault();
     });
+    TIMER.stop();
   }
 }
 
@@ -136,11 +233,11 @@ function pickHandler(e) {
       }
       target.classList.toggle("game__cell-fill");
     }
-  
+
     if (button === 2) {
       if (target.classList.contains("game__cell-fill")) {
-        answer = 0;
         target.classList.remove("game__cell-fill");
+        answer = 0;
         deleteMatrixElement(currentCellParent, currentCell);
       }
       target.classList.toggle("game__cell-cross");
@@ -148,7 +245,20 @@ function pickHandler(e) {
   }
 }
 
+function startTimer() {
+  TIMER.start();
+  BODY.removeEventListener("click", startTimer);
+}
+
+function saveGame(gameWrap, gameSelectContainer) {
+  console.log(gameWrap, gameSelectContainer);
+}
+
 function randomGame(gameWrap, gameSelectContainer) {
+  TIMER.reset();
+  TIMER.stop();
+  MATRIX = [];
+  SAVE_BUTTON.disabled = false;
   const arrMain = Object.keys(template);
   const randomSize = Math.floor(Math.random() * arrMain.length);
   const arrSecond = Object.keys(template[Number(arrMain[randomSize])]);
@@ -191,12 +301,14 @@ function randomGame(gameWrap, gameSelectContainer) {
   }
 }
 
-function resetGame(gameWrap, gameStages) {
-  console.log(gameStages, gameWrap);
+function resetGame(gameContent) {
+  console.log(gameContent);
   return;
 }
 
 function showSolution(gameWrap) {
+  TIMER.stop();
+  SAVE_BUTTON.disabled = true;
   const solution = template[nonogramSize][nonogramName];
   const gameCellsList = gameWrap.querySelectorAll(".game__cells");
   gameCellsList.forEach((cells) => {
@@ -211,7 +323,7 @@ function showSolution(gameWrap) {
       }
     });
   });
-  BODY.removeEventListener("mousedown", pickHandler);
+  BODY.removeEventListener("click", pickHandler);
   BODY.removeEventListener("contextmenu", pickHandler);
   BODY.addEventListener("contextmenu", (e) => {
     e.preventDefault();
@@ -306,67 +418,6 @@ function createMatrix(num) {
   }
 
   return MATRIX;
-}
-
-function createPlace(nonogramSize, nonogramName) {
-  const place = document.createElement("div");
-  place.className = "game__place";
-
-  const top = document.createElement("div");
-  top.className = "game__top clues";
-  const left = document.createElement("div");
-  left.className = "game__left clues";
-  BODY = document.createElement("div");
-  BODY.className = "game__body";
-
-  const { pic, rows, cols } = getGamePlace(nonogramSize, nonogramName);
-  const topClues = createCluesList(cols, "top");
-  const leftClues = createCluesList(rows, "left");
-
-  pic.forEach((p, i) => {
-    const div = document.createElement("div");
-    div.className = "game__cells";
-    div.dataset.cells = i;
-    if ((i + 1) % 5 === 0) {
-      div.classList.add("game__cells-border");
-    }
-    p.forEach((_, j) => {
-      const cell = document.createElement("div");
-      cell.className = "game__cell";
-      cell.dataset.cell = j;
-      if ((j + 1) % 5 === 0) {
-        cell.classList.add("game__cell-border");
-      }
-
-      div.append(cell);
-    });
-    BODY.append(div);
-  });
-
-  BODY.addEventListener("mousedown", pickHandler);
-  BODY.addEventListener("contextmenu", pickHandler);
-
-  top.append(topClues);
-  left.append(leftClues);
-  place.append(top, left, BODY);
-  return place;
-}
-
-function createGameSpace(nonogramSize, nonogramName) {
-  const game = document.createElement("div");
-  game.className = "game__content";
-  const gameWrap = document.createElement("div");
-  gameWrap.className = "game__wrap";
-  const title = document.createElement("h2");
-  title.className = "game__title";
-  title.textContent = nonogramName;
-  let gamePlace = createPlace(nonogramSize, nonogramName);
-  MATRIX = createMatrix(nonogramSize);
-
-  gameWrap.append(title, gamePlace);
-  game.append(gameWrap);
-
-  return game;
 }
 
 function createSelectLevels(gameWrap, gameSelectContainer) {
@@ -470,6 +521,8 @@ function createSelectStages(gameWrap, currentNonogramName = nonogramName) {
       );
       target.classList.add("select__option-current");
       MATRIX = [];
+      TIMER.stop();
+      TIMER.reset();
       renderGame(nonogramSize, nonogramName, gameWrap);
     }
   }
@@ -477,6 +530,79 @@ function createSelectStages(gameWrap, currentNonogramName = nonogramName) {
   selectStages.addEventListener("click", selectHandler);
 
   return selectStages;
+}
+
+function getTimer() {
+  const hours = document.createElement("span");
+  hours.className = "timer__hours";
+  hours.textContent = "00:";
+  const minutes = document.createElement("span");
+  minutes.className = "timer__minutes";
+  minutes.textContent = "00:";
+  const seconds = document.createElement("span");
+  seconds.className = "timer__seconds";
+  seconds.textContent = "00";
+
+  return { hours, minutes, seconds };
+}
+
+function createPlace(nonogramSize, nonogramName) {
+  const place = document.createElement("div");
+  place.className = "game__place";
+
+  const top = document.createElement("div");
+  top.className = "game__top clues";
+  const left = document.createElement("div");
+  left.className = "game__left clues";
+  BODY = document.createElement("div");
+  BODY.className = "game__body";
+
+  const { pic, rows, cols } = getGamePlace(nonogramSize, nonogramName);
+  const topClues = createCluesList(cols, "top");
+  const leftClues = createCluesList(rows, "left");
+
+  pic.forEach((p, i) => {
+    const div = document.createElement("div");
+    div.className = "game__cells";
+    div.dataset.cells = i;
+    if ((i + 1) % 5 === 0) {
+      div.classList.add("game__cells-border");
+    }
+    p.forEach((_, j) => {
+      const cell = document.createElement("div");
+      cell.className = "game__cell";
+      cell.dataset.cell = j;
+      if ((j + 1) % 5 === 0) {
+        cell.classList.add("game__cell-border");
+      }
+
+      div.append(cell);
+    });
+    BODY.append(div);
+  });
+
+  BODY.addEventListener("click", pickHandler);
+  BODY.addEventListener("contextmenu", pickHandler);
+  BODY.addEventListener("click", startTimer);
+
+  top.append(topClues);
+  left.append(leftClues);
+  place.append(top, left, BODY);
+  return place;
+}
+
+function createGameSpace(nonogramSize, nonogramName) {
+  const game = document.createElement("div");
+  game.className = "game__content";
+  const title = document.createElement("h2");
+  title.className = "game__title";
+  title.textContent = nonogramName;
+  let gamePlace = createPlace(nonogramSize, nonogramName);
+  MATRIX = createMatrix(nonogramSize);
+
+  game.append(title, gamePlace);
+
+  return game;
 }
 
 function createHeaderContent() {
@@ -513,46 +639,68 @@ function createMainContent() {
 
   const gameContainer = createContainer("game", true);
   const gameSelectContainer = createContainer("game__select", false);
+
   const gameWrap = document.createElement("div");
   gameWrap.className = "game__wrap";
+
+  const gameTimer = document.createElement("div");
+  gameTimer.className = "game__timer";
+  const gameTimerBlock = document.createElement("p");
+  gameTimerBlock.className = "timer";
+  const { hours, minutes, seconds } = getTimer();
+
   const gameContent = createGameSpace(nonogramSize, nonogramName);
   const gameButtonsContainer = createContainer("game__buttons", false);
   const gameLevels = createSelectLevels(gameWrap, gameSelectContainer);
   const gameStages = createSelectStages(gameWrap);
 
-  const saveButton = new Button("Save game", "game").create();
-  const randomGameButton = new Button("Random game", "game").create();
-  const solutionButton = new Button("Solution", "game").create();
-  const continueGameButton = new Button("Continue game", "game").create();
-  const resetGameButton = new Button("Reset game", "game").create();
+  SAVE_BUTTON = new Button("Save game", "game").create();
+  RANDOM_GAME_BUTTON = new Button("Random game", "game").create();
+  SOLUTION_BUTTON = new Button("Solution", "game").create();
+  CONTINUE_GAME_BUTTON = new Button("Continue game", "game").create();
+  RESET_GAME_BUTTON = new Button("Reset game", "game").create();
 
-  randomGameButton.addEventListener("click", (e) => {
+  TIMER = new Timer(hours, minutes, seconds, 0, 0, 0);
+
+  SAVE_BUTTON.addEventListener("click", (e) => {
+    e.preventDefault();
+    saveGame(gameWrap, gameSelectContainer);
+  });
+
+  RANDOM_GAME_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
     randomGame(gameWrap, gameSelectContainer);
   });
 
-  solutionButton.addEventListener("click", (e) => {
+  SOLUTION_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
     showSolution(gameWrap);
   });
 
-  resetGameButton.addEventListener("click", (e) => {
+  RESET_GAME_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
-    resetGame(gameWrap);
+    resetGame(gameContent);
   });
 
+  gameTimerBlock.append(hours, minutes, seconds);
+  gameTimer.append(gameTimerBlock);
   gameWrap.append(gameContent);
   gameButtonsContainer.append();
   gameSelectContainer.append(gameLevels, gameStages);
   gameButtonsContainer.append(
-    saveButton,
-    continueGameButton,
-    randomGameButton,
-    solutionButton,
-    resetGameButton
+    SAVE_BUTTON,
+    CONTINUE_GAME_BUTTON,
+    RANDOM_GAME_BUTTON,
+    SOLUTION_BUTTON,
+    RESET_GAME_BUTTON
   );
 
-  gameContainer.append(gameSelectContainer, gameWrap, gameButtonsContainer);
+  gameContainer.append(
+    gameSelectContainer,
+    gameTimer,
+    gameWrap,
+    gameButtonsContainer
+  );
   main.append(gameContainer);
 
   return main;
