@@ -142,6 +142,7 @@ class Timer {
     this.timer = setInterval(() => {
       this.update();
     }, 1000);
+    console.log("Timer started");
   }
 
   update() {
@@ -186,6 +187,7 @@ class Timer {
   }
 
   stop() {
+    console.log("Timer stoped");
     clearInterval(this.timer);
   }
 }
@@ -193,13 +195,9 @@ class Timer {
 function checkWin(matrix, currentPlace) {
   if (matrix.toString() === currentPlace.toString()) {
     console.log("Win");
-    BODY.removeEventListener("click", pickHandler);
-    BODY.removeEventListener("contextmenu", pickHandler);
-    BODY.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-    });
+    removeBodyListener(pickHandler, true);
     TIMER.stop();
-    disabledButtons(SAVE_BUTTON);
+    disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
   }
 }
 
@@ -246,6 +244,33 @@ function pickHandler(e) {
   }
 }
 
+function startGame() {
+  if (!TIMER_RUN) {
+    TIMER.start();
+    TIMER_RUN = true;
+  }
+  removeBodyListener(startGame);
+  activatedButtons([SAVE_BUTTON, RESET_GAME_BUTTON, SOLUTION_BUTTON]);
+}
+
+function addBodyListener() {
+  BODY.addEventListener("click", pickHandler);
+  BODY.addEventListener("contextmenu", pickHandler);
+  BODY.addEventListener("click", startGame);
+  BODY.addEventListener("contextmenu", startGame);
+}
+
+function removeBodyListener(callback, contextmenu) {
+  BODY.removeEventListener("click", callback);
+  BODY.removeEventListener("contextmenu", callback);
+
+  if (contextmenu) {
+    BODY.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
+  }
+}
+
 function disabledButtons(buttons) {
   if (Array.isArray(buttons)) {
     buttons.forEach((button) => (button.disabled = true));
@@ -262,21 +287,17 @@ function activatedButtons(buttons) {
   }
 }
 
-function startGame() {
-  TIMER.start();
-  BODY.removeEventListener("click", startGame);
-  activatedButtons([SAVE_BUTTON, RESET_GAME_BUTTON]);
-}
-
 function saveGame(gameWrap, gameSelectContainer) {
   console.log(gameWrap, gameSelectContainer);
 }
 
 function randomGame(gameWrap, gameSelectContainer) {
+  if (TIMER_RUN) {
+    TIMER.stop();
+    TIMER_RUN = false;
+  }
   TIMER.reset();
-  TIMER.stop();
   MATRIX = [];
-  activatedButtons(SOLUTION_BUTTON);
   const arrMain = Object.keys(template);
   const randomSize = Math.floor(Math.random() * arrMain.length);
   const arrSecond = Object.keys(template[Number(arrMain[randomSize])]);
@@ -320,13 +341,22 @@ function randomGame(gameWrap, gameSelectContainer) {
 }
 
 function resetGame(gameContent) {
-  console.log(gameContent);
+  Array.from(gameContent.querySelectorAll(".game__cell")).forEach((cell) => {
+    cell.classList.remove("game__cell-fill");
+    cell.classList.remove("game__cell-cross");
+  });
+  addBodyListener();
+  MATRIX = createMatrix(nonogramSize);
   return;
 }
 
 function showSolution(gameWrap) {
-  TIMER.stop();
-  disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
+  if (TIMER_RUN) {
+    TIMER.stop();
+    TIMER_RUN = false;
+  }
+  TIMER.reset();
+  disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON, RESET_GAME_BUTTON]);
   const solution = template[nonogramSize][nonogramName];
   const gameCellsList = gameWrap.querySelectorAll(".game__cells");
   gameCellsList.forEach((cells) => {
@@ -341,11 +371,7 @@ function showSolution(gameWrap) {
       }
     });
   });
-  BODY.removeEventListener("click", pickHandler);
-  BODY.removeEventListener("contextmenu", pickHandler);
-  BODY.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-  });
+  removeBodyListener(pickHandler, true);
 }
 
 function createContainer(containerClass = "", need) {
@@ -427,6 +453,7 @@ function createCluesList(clues, cluesClass) {
 }
 
 function createMatrix(num) {
+  MATRIX = [];
   for (let i = 0; i < num; i++) {
     const temp = [];
     for (let j = 0; j < num; j++) {
@@ -466,7 +493,6 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
   function selectHandler(e) {
     const target = e.target;
     nonogramSize = target.dataset.size;
-    nonogramName = target.dataset.name;
     if (target.classList.contains("select__header")) {
       selectBody.classList.toggle("select__body--show");
     }
@@ -483,12 +509,15 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
           el.remove();
         }
       });
-      gameSelectContainer.append(
-        createSelectStages(
-          gameWrap,
-          Object.keys(template[target.dataset.size])[0]
-        )
-      );
+      const firstItem = Object.keys(template[target.dataset.size])[0];
+
+      if (TIMER_RUN) {
+        TIMER.stop();
+        TIMER_RUN = false;
+      }
+      TIMER.reset();
+      renderGame(nonogramSize, firstItem, gameWrap);
+      gameSelectContainer.append(createSelectStages(gameWrap, firstItem));
     }
   }
 
@@ -498,6 +527,10 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
 }
 
 function createSelectStages(gameWrap, currentNonogramName = nonogramName) {
+  if (TIMER_RUN) {
+    TIMER.stop();
+    TIMER_RUN = false;
+  }
   const selectStages = document.createElement("div");
   selectStages.className = `select select-stages`;
   const selectHeader = document.createElement("div");
@@ -538,10 +571,13 @@ function createSelectStages(gameWrap, currentNonogramName = nonogramName) {
         (option) => option.classList.remove("select__option-current")
       );
       target.classList.add("select__option-current");
-      MATRIX = [];
-      TIMER.stop();
+      MATRIX = createMatrix(nonogramSize);
+      if (TIMER_RUN) {
+        TIMER.stop();
+        TIMER_RUN = false;
+      }
       TIMER.reset();
-      activatedButtons(SAVE_BUTTON);
+      activatedButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
       renderGame(nonogramSize, nonogramName, gameWrap);
     }
   }
@@ -600,9 +636,7 @@ function createPlace(nonogramSize, nonogramName) {
     BODY.append(div);
   });
 
-  BODY.addEventListener("click", pickHandler);
-  BODY.addEventListener("contextmenu", pickHandler);
-  BODY.addEventListener("click", startGame);
+  addBodyListener();
 
   top.append(topClues);
   left.append(leftClues);
@@ -699,7 +733,7 @@ function createMainContent() {
 
   RESET_GAME_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
-    resetGame(gameContent);
+    resetGame(gameWrap);
   });
 
   gameTimerBlock.append(hours, minutes, seconds);
