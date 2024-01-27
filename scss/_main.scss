@@ -24,6 +24,11 @@ p {
   justify-content: center;
   align-items: center;
 
+  &__select {
+    display: flex;
+    gap: 20px;
+  }
+
   &__place {
     display: inline-grid;
     background-color: beige;
@@ -56,6 +61,7 @@ p {
   &__cell {
     position: relative;
     cursor: pointer;
+    flex: 1 1 100%;
     border: 0.5px solid $color-border;
     background-color: $bcg-light;
     width: 20px;
@@ -97,7 +103,7 @@ p {
 .select {
   position: relative;
   background-color: $bcg-light;
-  width: 300px;
+  width: 150px;
   z-index: 99;
 
   &__header {

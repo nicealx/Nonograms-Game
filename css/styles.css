@@ -42,6 +42,12 @@ p {
       -ms-flex-align: center;
           align-items: center;
 }
+.game__select {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 20px;
+}
 .game__place {
   display: inline-grid;
   background-color: beige;
@@ -68,6 +74,9 @@ p {
 .game__cell {
   position: relative;
   cursor: pointer;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 1 100%;
+          flex: 1 1 100%;
   border: 0.5px solid grey;
   background-color: #fff;
   width: 20px;
@@ -104,7 +113,7 @@ p {
 .select {
   position: relative;
   background-color: #fff;
-  width: 300px;
+  width: 150px;
   z-index: 99;
 }
 .select__header {
