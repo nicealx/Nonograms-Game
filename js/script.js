@@ -94,6 +94,27 @@ class Button {
   }
 }
 
+function checkWin(matrix, currentPlace) {
+  if (matrix.toString() === currentPlace.toString()) {
+    console.log(1);
+    BODY.removeEventListener("mousedown", pickHandler);
+    BODY.removeEventListener("contextmenu", pickHandler);
+    BODY.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
+  }
+}
+
+function addMatrixElement(currentCellParent, currentCell, answer) {
+  MATRIX[currentCellParent][currentCell] = answer;
+  checkWin(MATRIX, template[nonogramSize][nonogramName]);
+}
+
+function deleteMatrixElement(currentCellParent, currentCell) {
+  MATRIX[currentCellParent][currentCell] = 0;
+  checkWin(MATRIX, template[nonogramSize][nonogramName]);
+}
+
 function pickHandler(e) {
   e.preventDefault();
   const button = e.button;
@@ -101,27 +122,29 @@ function pickHandler(e) {
   const currentCell = target.dataset.cell;
   const currentCellParent = target.parentNode.dataset.cells;
   let answer = 0;
-  if (button === 0) {
-    if (target.classList.contains("game__cell-cross")) {
-      target.classList.remove("game__cell-cross");
+  if (target.classList.contains("game__cell")) {
+    if (button === 0) {
+      if (target.classList.contains("game__cell-cross")) {
+        target.classList.remove("game__cell-cross");
+      }
+      if (target.classList.contains("game__cell-fill")) {
+        answer = 0;
+        deleteMatrixElement(currentCellParent, currentCell);
+      } else {
+        answer = 1;
+        addMatrixElement(currentCellParent, currentCell, answer);
+      }
+      target.classList.toggle("game__cell-fill");
     }
-    if (target.classList.contains("game__cell-fill")) {
-      answer = 0;
-      deleteMatrixElement(currentCellParent, currentCell);
-    } else {
-      answer = 1;
-      addMatrixElement(currentCellParent, currentCell, answer);
+  
+    if (button === 2) {
+      if (target.classList.contains("game__cell-fill")) {
+        answer = 0;
+        target.classList.remove("game__cell-fill");
+        deleteMatrixElement(currentCellParent, currentCell);
+      }
+      target.classList.toggle("game__cell-cross");
     }
-    target.classList.toggle("game__cell-fill");
-  }
-
-  if (button === 2) {
-    if (target.classList.contains("game__cell-fill")) {
-      answer = 0;
-      target.classList.remove("game__cell-fill");
-      deleteMatrixElement(currentCellParent, currentCell);
-    }
-    target.classList.toggle("game__cell-cross");
   }
 }
 
@@ -188,7 +211,7 @@ function showSolution(gameWrap) {
       }
     });
   });
-  BODY.removeEventListener("click", pickHandler);
+  BODY.removeEventListener("mousedown", pickHandler);
   BODY.removeEventListener("contextmenu", pickHandler);
   BODY.addEventListener("contextmenu", (e) => {
     e.preventDefault();
@@ -285,24 +308,6 @@ function createMatrix(num) {
   return MATRIX;
 }
 
-function checkWin(matrix, currentPlace) {
-  if (matrix.toString() === currentPlace.toString()) {
-    console.log(1);
-    BODY.removeEventListener("click", pickHandler);
-    BODY.removeEventListener("contextmenu", pickHandler);
-  }
-}
-
-function addMatrixElement(currentCellParent, currentCell, answer) {
-  MATRIX[currentCellParent][currentCell] = answer;
-  checkWin(MATRIX, template[nonogramSize][nonogramName]);
-}
-
-function deleteMatrixElement(currentCellParent, currentCell) {
-  MATRIX[currentCellParent][currentCell] = 0;
-  checkWin(MATRIX, template[nonogramSize][nonogramName]);
-}
-
 function createPlace(nonogramSize, nonogramName) {
   const place = document.createElement("div");
   place.className = "game__place";
@@ -338,7 +343,7 @@ function createPlace(nonogramSize, nonogramName) {
     BODY.append(div);
   });
 
-  BODY.addEventListener("click", pickHandler);
+  BODY.addEventListener("mousedown", pickHandler);
   BODY.addEventListener("contextmenu", pickHandler);
 
   top.append(topClues);
@@ -409,7 +414,12 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
           el.remove();
         }
       });
-      gameSelectContainer.append(createSelectStages(gameWrap, Object.keys(template[target.dataset.size])[0]));
+      gameSelectContainer.append(
+        createSelectStages(
+          gameWrap,
+          Object.keys(template[target.dataset.size])[0]
+        )
+      );
     }
   }
 
