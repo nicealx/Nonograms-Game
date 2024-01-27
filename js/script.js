@@ -199,6 +199,7 @@ function checkWin(matrix, currentPlace) {
       e.preventDefault();
     });
     TIMER.stop();
+    disabledButtons(SAVE_BUTTON);
   }
 }
 
@@ -245,9 +246,26 @@ function pickHandler(e) {
   }
 }
 
-function startTimer() {
+function disabledButtons(buttons) {
+  if (Array.isArray(buttons)) {
+    buttons.forEach((button) => (button.disabled = true));
+  } else {
+    buttons.disabled = true;
+  }
+}
+
+function activatedButtons(buttons) {
+  if (Array.isArray(buttons)) {
+    buttons.forEach((button) => (button.disabled = false));
+  } else {
+    buttons.disabled = false;
+  }
+}
+
+function startGame() {
   TIMER.start();
-  BODY.removeEventListener("click", startTimer);
+  BODY.removeEventListener("click", startGame);
+  activatedButtons([SAVE_BUTTON, RESET_GAME_BUTTON]);
 }
 
 function saveGame(gameWrap, gameSelectContainer) {
@@ -258,7 +276,7 @@ function randomGame(gameWrap, gameSelectContainer) {
   TIMER.reset();
   TIMER.stop();
   MATRIX = [];
-  SAVE_BUTTON.disabled = false;
+  activatedButtons(SOLUTION_BUTTON);
   const arrMain = Object.keys(template);
   const randomSize = Math.floor(Math.random() * arrMain.length);
   const arrSecond = Object.keys(template[Number(arrMain[randomSize])]);
@@ -308,7 +326,7 @@ function resetGame(gameContent) {
 
 function showSolution(gameWrap) {
   TIMER.stop();
-  SAVE_BUTTON.disabled = true;
+  disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
   const solution = template[nonogramSize][nonogramName];
   const gameCellsList = gameWrap.querySelectorAll(".game__cells");
   gameCellsList.forEach((cells) => {
@@ -523,6 +541,7 @@ function createSelectStages(gameWrap, currentNonogramName = nonogramName) {
       MATRIX = [];
       TIMER.stop();
       TIMER.reset();
+      activatedButtons(SAVE_BUTTON);
       renderGame(nonogramSize, nonogramName, gameWrap);
     }
   }
@@ -583,7 +602,7 @@ function createPlace(nonogramSize, nonogramName) {
 
   BODY.addEventListener("click", pickHandler);
   BODY.addEventListener("contextmenu", pickHandler);
-  BODY.addEventListener("click", startTimer);
+  BODY.addEventListener("click", startGame);
 
   top.append(topClues);
   left.append(leftClues);
@@ -662,6 +681,7 @@ function createMainContent() {
 
   TIMER = new Timer(hours, minutes, seconds, 0, 0, 0);
 
+  disabledButtons([SAVE_BUTTON, RESET_GAME_BUTTON]);
   SAVE_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
     saveGame(gameWrap, gameSelectContainer);
