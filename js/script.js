@@ -3,6 +3,7 @@ let MATRIX = [];
 let NONOGRAM_SIZE = 5;
 let NONOGRAM_NAME = "cup";
 let BODY = null;
+let GAME_CONTAINER = null;
 
 let TIMER = null;
 let TIMER_RUN = false;
@@ -583,6 +584,26 @@ function createSelectStages(
 
   selectStages.addEventListener("click", selectHandler);
 
+  GAME_CONTAINER.addEventListener("click", function (e) {
+    const target = e.target;
+    const bodyLevels = GAME_CONTAINER.querySelector(".select__body-levels");
+    const bodyStages = GAME_CONTAINER.querySelector(".select__body-stages");
+    
+    if (
+      !target.classList.contains("select__header-levels") &&
+      !target.classList.contains("select__current-levels")
+    ) {
+      bodyLevels.classList.remove("select__body--show");
+    }
+
+    if (
+      !target.classList.contains("select__header-stages") &&
+      !target.classList.contains("select__current-stages")
+    ) {
+      bodyStages.classList.remove("select__body--show");
+    }
+  });
+
   return selectStages;
 }
 
@@ -689,7 +710,7 @@ function createMainContent() {
   const main = document.createElement("main");
   main.className = "main";
 
-  const gameContainer = createContainer("game", true);
+  GAME_CONTAINER = createContainer("game", true);
   const gameSelectContainer = createContainer("game__select", false);
 
   const gameWrap = document.createElement("div");
@@ -747,33 +768,13 @@ function createMainContent() {
     RESET_GAME_BUTTON
   );
 
-  gameContainer.append(
+  GAME_CONTAINER.append(
     gameSelectContainer,
     gameTimer,
     gameWrap,
     gameButtonsContainer
   );
-  main.append(gameContainer);  
-
-  const bodyLevels = gameContainer.querySelector(".select__body-levels");
-  const bodyStages = gameContainer.querySelector(".select__body-stages");
-  
-  gameContainer.addEventListener("click", function(e) {
-    const target = e.target;
-    if (
-      !target.classList.contains("select__header-levels") &&
-      !target.classList.contains("select__current-levels")
-      ) {
-        bodyLevels.classList.remove("select__body--show");
-    }
-
-    if (
-      !target.classList.contains("select__header-stages") &&
-      !target.classList.contains("select__current-stages")
-    ) {
-      bodyStages.classList.remove("select__body--show");
-    }
-  });
+  main.append(GAME_CONTAINER);
 
   return main;
 }
