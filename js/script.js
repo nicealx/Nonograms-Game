@@ -1,14 +1,13 @@
-import Timer from "./timer.js"
+import Timer from "./timer.js";
 
-const DOC = document.querySelector("body");
+const DOC = document.querySelector(".body");
 let MATRIX = [];
 let NONOGRAM_SIZE = 5;
 let NONOGRAM_NAME = "cup";
 let BODY = null;
 let GAME_CONTAINER = null;
 let GAME_WRAP = null;
-const { HOURS, MINUTES, SECONDS } = getTimer();
-
+const { MINUTES, SECONDS } = getTimer();
 
 let TIMER = null;
 let TIMER_RUN = false;
@@ -114,7 +113,7 @@ class Button {
 function checkWin(matrix, currentPlace) {
   if (matrix.toString() === currentPlace.toString()) {
     console.log("Win");
-    removeBodyListener(pickHandler, true);
+    removeBodyListener([pickHandler], true);
     TIMER.stop();
     disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
   }
@@ -169,20 +168,22 @@ function startGame() {
     TIMER.start();
     TIMER_RUN = true;
   }
-  removeBodyListener(startGame);
+  removeBodyListener([startGame]);
   activatedButtons([SAVE_BUTTON, RESET_GAME_BUTTON, SOLUTION_BUTTON]);
 }
 
-function addBodyListener() {
-  BODY.addEventListener("click", pickHandler);
-  BODY.addEventListener("contextmenu", pickHandler);
-  BODY.addEventListener("click", startGame);
-  BODY.addEventListener("contextmenu", startGame);
+function addBodyListener(callbacks) {
+  callbacks.forEach((callback) => {
+    BODY.addEventListener("click", callback);
+    BODY.addEventListener("contextmenu", callback);
+  });
 }
 
-function removeBodyListener(callback, contextmenu) {
-  BODY.removeEventListener("click", callback);
-  BODY.removeEventListener("contextmenu", callback);
+function removeBodyListener(callbacks, contextmenu = false) {
+  callbacks.forEach((callback) => {
+    BODY.removeEventListener("click", callback);
+    BODY.removeEventListener("contextmenu", callback);
+  });
 
   if (contextmenu) {
     BODY.addEventListener("contextmenu", (e) => {
@@ -222,13 +223,13 @@ function continueGame(gameSelectContainer) {
   const save = JSON.parse(sessionStorage.getItem("save"));
   MATRIX = save["matrix"];
   TIMER.stop();
-  TIMER = new Timer(HOURS, MINUTES, SECONDS, ...save["currentTimer"]);
+  TIMER = new Timer(MINUTES, SECONDS, ...save["currentTimer"]);
   TIMER.start();
   TIMER_RUN = true;
   NONOGRAM_NAME = save["nonogramName"];
   NONOGRAM_SIZE = save["nonogramSize"];
   renderGame(NONOGRAM_SIZE, NONOGRAM_NAME, false);
-  
+
   const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
   gameCellsList.forEach((cells) => {
     const row = MATRIX[cells.dataset.cells];
@@ -246,11 +247,15 @@ function continueGame(gameSelectContainer) {
   Array.from(gameSelectContainer.children).forEach((el) => {
     el.remove();
   });
+  activatedButtons([RESET_GAME_BUTTON, SAVE_BUTTON])
 
-  gameSelectContainer.append(createSelectLevels(gameSelectContainer), createSelectStages(NONOGRAM_SIZE, NONOGRAM_NAME));
+  gameSelectContainer.append(
+    createSelectLevels(gameSelectContainer),
+    createSelectStages(NONOGRAM_SIZE, NONOGRAM_NAME)
+  );
 }
 
-function randomGame(gameSelectContainer) {
+function randomGame(gameSelectContainer, gameLevels, gameStages) {
   if (TIMER_RUN) {
     TIMER.stop();
     TIMER_RUN = false;
@@ -267,26 +272,24 @@ function randomGame(gameSelectContainer) {
   NONOGRAM_SIZE = arrMain[randomSize];
   NONOGRAM_NAME = arrSecond[randomName];
 
-  const levelsSelect = gameSelectContainer.querySelector(".select-levels");
-  const currentLevelSelect = levelsSelect.querySelector(".select__current");
-  const levelsSelectOptions = levelsSelect.querySelectorAll(".select__option");
-
-  Array.from(gameSelectContainer.querySelectorAll(".select__option")).forEach(
-    (option) => option.classList.remove("select__option-current")
-  );
-
-  Array.from(levelsSelectOptions).forEach((el) => {
-    if (el.dataset.size === arrMain[randomSize]) {
-      el.classList.add("select__option-current");
-    }
-  });
-
   if (
     sessionSize === arrMain[randomSize] &&
     sessionName === arrSecond[randomName]
   ) {
-    randomGame();
+    return randomGame();
   } else {
+    const currentLevelSelect = gameLevels.children[0].firstChild;
+    const levelsSelectOptions = gameLevels.querySelectorAll(".select__option");
+
+    Array.from(gameSelectContainer.querySelectorAll(".select__option")).forEach(
+      (option) => option.classList.remove("select__option-current")
+    );
+
+    Array.from(levelsSelectOptions).forEach((el) => {
+      if (el.dataset.size === arrMain[randomSize]) {
+        el.classList.add("select__option-current");
+      }
+    });
     sessionStorage.setItem("NONOGRAM_SIZE", arrMain[randomSize]);
     sessionStorage.setItem("NONOGRAM_NAME", arrSecond[randomName]);
     currentLevelSelect.textContent = DIFFICULTY[arrMain[randomSize]];
@@ -308,7 +311,7 @@ function resetGame() {
     cell.classList.remove("game__cell-cross");
     cell.classList.remove("game__cell-unuse");
   });
-  addBodyListener();
+  addBodyListener([pickHandler, startGame]);
   MATRIX = createMatrix(NONOGRAM_SIZE);
   return;
 }
@@ -320,6 +323,7 @@ function showSolution() {
   }
   TIMER.reset();
   disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
+  activatedButtons(RESET_GAME_BUTTON);
   const solution = TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME];
   const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
   gameCellsList.forEach((cells) => {
@@ -334,7 +338,7 @@ function showSolution() {
       }
     });
   });
-  removeBodyListener(pickHandler, true);
+  removeBodyListener([pickHandler, startGame], false);
 }
 
 function createContainer(containerClass = "", need) {
@@ -565,9 +569,6 @@ function createSelectStages(
 }
 
 function getTimer() {
-  const HOURS = document.createElement("span");
-  HOURS.className = "timer__hours";
-  HOURS.textContent = "00:";
   const MINUTES = document.createElement("span");
   MINUTES.className = "timer__minutes";
   MINUTES.textContent = "00:";
@@ -575,7 +576,7 @@ function getTimer() {
   SECONDS.className = "timer__seconds";
   SECONDS.textContent = "00";
 
-  return { HOURS, MINUTES, SECONDS };
+  return { MINUTES, SECONDS };
 }
 
 function createPlace(nonogramSize, nonogramName) {
@@ -613,7 +614,7 @@ function createPlace(nonogramSize, nonogramName) {
     BODY.append(div);
   });
 
-  addBodyListener();
+  addBodyListener([pickHandler, startGame]);
 
   top.append(topClues);
   left.append(leftClues);
@@ -687,10 +688,10 @@ function createMainContent() {
   SAVE_BUTTON = new Button("Save game", "game").create();
   RANDOM_GAME_BUTTON = new Button("Random game", "game").create();
   SOLUTION_BUTTON = new Button("Solution", "game").create();
-  CONTINUE_GAME_BUTTON = new Button("Continue game", "game").create();
+  CONTINUE_GAME_BUTTON = new Button("Continue last game", "game").create();
   RESET_GAME_BUTTON = new Button("Reset game", "game").create();
 
-  TIMER = new Timer(HOURS, MINUTES, SECONDS, 0, 0, 0);
+  TIMER = new Timer(MINUTES, SECONDS, 0, 0, 0);
 
   disabledButtons([SAVE_BUTTON, RESET_GAME_BUTTON]);
 
@@ -706,7 +707,7 @@ function createMainContent() {
 
   RANDOM_GAME_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
-    randomGame(gameSelectContainer);
+    randomGame(gameSelectContainer, gameLevels, gameStages);
   });
 
   SOLUTION_BUTTON.addEventListener("click", (e) => {
@@ -719,7 +720,7 @@ function createMainContent() {
     resetGame();
   });
 
-  gameTimerBlock.append(HOURS, MINUTES, SECONDS);
+  gameTimerBlock.append(MINUTES, SECONDS);
   gameTimer.append(gameTimerBlock);
   GAME_WRAP.append(gameContent);
   gameSelectContainer.append(gameLevels, gameStages);

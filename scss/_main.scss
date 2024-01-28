@@ -7,6 +7,12 @@ p {
   padding: 0;
 }
 
+.body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -18,11 +24,19 @@ p {
   gap: 20px;
 }
 
-.game {
+.main {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex: 1 1 100%;
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
+  flex: 1 1 100%;
 
   &__select {
     display: flex;
