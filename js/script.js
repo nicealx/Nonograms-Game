@@ -1,7 +1,7 @@
 const DOC = document.querySelector("body");
 let MATRIX = [];
-let nonogramSize = 5;
-let nonogramName = "cup";
+let NONOGRAM_SIZE = 5;
+let NONOGRAM_NAME = "cup";
 let BODY = null;
 
 let TIMER = null;
@@ -13,10 +13,10 @@ let CONTINUE_GAME_BUTTON = null;
 let RESET_GAME_BUTTON = null;
 let SOLUTION_BUTTON = null;
 
-sessionStorage.setItem("nonogramSize", 0);
-sessionStorage.setItem("nonogramName", "cup");
+sessionStorage.setItem("NONOGRAM_SIZE", 0);
+sessionStorage.setItem("NONOGRAM_NAME", "cup");
 
-const template = {
+const TEMPLATE = {
   5: {
     "cup": [
       [0, 1, 1, 1, 0],
@@ -55,18 +55,18 @@ const template = {
     ],
   },
   10: {
-    "1": new Array(10).fill(new Array(10).fill(1)),
-    "2": new Array(10).fill(new Array(10).fill(1)),
-    "3": new Array(10).fill(new Array(10).fill(1)),
-    "4": new Array(10).fill(new Array(10).fill(1)),
-    "5": new Array(10).fill(new Array(10).fill(1)),
+    "first": new Array(10).fill(new Array(10).fill(1)),
+    "second": new Array(10).fill(new Array(10).fill(1)),
+    "third": new Array(10).fill(new Array(10).fill(1)),
+    "fourth": new Array(10).fill(new Array(10).fill(1)),
+    "five": new Array(10).fill(new Array(10).fill(1)),
   },
   15: {
-    "1": new Array(15).fill(new Array(15).fill(1)),
-    "2": new Array(15).fill(new Array(15).fill(1)),
-    "3": new Array(15).fill(new Array(15).fill(1)),
-    "4": new Array(15).fill(new Array(15).fill(1)),
-    "5": new Array(15).fill(new Array(15).fill(1)),
+    "first": new Array(15).fill(new Array(15).fill(1)),
+    "second": new Array(15).fill(new Array(15).fill(1)),
+    "third": new Array(15).fill(new Array(15).fill(1)),
+    "fourth": new Array(15).fill(new Array(15).fill(1)),
+    "five": new Array(15).fill(new Array(15).fill(1)),
   },
 };
 
@@ -203,12 +203,12 @@ function checkWin(matrix, currentPlace) {
 
 function addMatrixElement(currentCellParent, currentCell, answer) {
   MATRIX[currentCellParent][currentCell] = answer;
-  checkWin(MATRIX, template[nonogramSize][nonogramName]);
+  checkWin(MATRIX, TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME]);
 }
 
 function deleteMatrixElement(currentCellParent, currentCell) {
   MATRIX[currentCellParent][currentCell] = 0;
-  checkWin(MATRIX, template[nonogramSize][nonogramName]);
+  checkWin(MATRIX, TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME]);
 }
 
 function pickHandler(e) {
@@ -219,6 +219,7 @@ function pickHandler(e) {
   const currentCellParent = target.parentNode.dataset.cells;
   let answer = 0;
   if (target.classList.contains("game__cell")) {
+    activatedButtons(RESET_GAME_BUTTON);
     if (button === 0) {
       if (target.classList.contains("game__cell-cross")) {
         target.classList.remove("game__cell-cross");
@@ -295,18 +296,18 @@ function randomGame(gameWrap, gameSelectContainer) {
   if (TIMER_RUN) {
     TIMER.stop();
     TIMER_RUN = false;
+    TIMER.reset();
   }
-  TIMER.reset();
   MATRIX = [];
-  const arrMain = Object.keys(template);
+  const arrMain = Object.keys(TEMPLATE);
   const randomSize = Math.floor(Math.random() * arrMain.length);
-  const arrSecond = Object.keys(template[Number(arrMain[randomSize])]);
+  const arrSecond = Object.keys(TEMPLATE[Number(arrMain[randomSize])]);
   const randomName = Math.floor(Math.random() * arrSecond.length);
-  const sessionSize = Number(sessionStorage.getItem("nonogramSize"));
-  const sessionName = sessionStorage.getItem("nonogramName");
-  nonogramSize = arrMain[randomSize];
-  nonogramName = arrSecond[randomName];
-
+  const sessionSize = Number(sessionStorage.getItem("NONOGRAM_SIZE"));
+  const sessionName = sessionStorage.getItem("NONOGRAM_NAME");
+  arrMain[randomSize] = Number(arrMain[randomSize]);
+  NONOGRAM_SIZE = arrMain[randomSize];
+  NONOGRAM_NAME = arrSecond[randomName];
   const levelsSelect = gameSelectContainer.querySelector(".select-levels");
   const currentLevelSelect = levelsSelect.querySelector(".select__current");
   const levelsSelectOptions = levelsSelect.querySelectorAll(".select__option");
@@ -327,8 +328,8 @@ function randomGame(gameWrap, gameSelectContainer) {
   ) {
     randomGame();
   } else {
-    sessionStorage.setItem("nonogramSize", arrMain[randomSize]);
-    sessionStorage.setItem("nonogramName", arrSecond[randomName]);
+    sessionStorage.setItem("NONOGRAM_SIZE", arrMain[randomSize]);
+    sessionStorage.setItem("NONOGRAM_NAME", arrSecond[randomName]);
     currentLevelSelect.textContent = `${arrMain[randomSize]}*${arrMain[randomSize]}`;
     renderGame(arrMain[randomSize], arrSecond[randomName], gameWrap);
     Array.from(gameSelectContainer.children).forEach((el) => {
@@ -336,6 +337,8 @@ function randomGame(gameWrap, gameSelectContainer) {
         el.remove();
       }
     });
+    // activatedButtons[RANDOM_GAME_BUTTON]
+    disabledButtons([RESET_GAME_BUTTON, SAVE_BUTTON]);
     gameSelectContainer.append(createSelectStages(gameWrap));
   }
 }
@@ -344,9 +347,10 @@ function resetGame(gameContent) {
   Array.from(gameContent.querySelectorAll(".game__cell")).forEach((cell) => {
     cell.classList.remove("game__cell-fill");
     cell.classList.remove("game__cell-cross");
+    cell.classList.remove("game__cell-unuse");
   });
   addBodyListener();
-  MATRIX = createMatrix(nonogramSize);
+  MATRIX = createMatrix(NONOGRAM_SIZE);
   return;
 }
 
@@ -356,14 +360,14 @@ function showSolution(gameWrap) {
     TIMER_RUN = false;
   }
   TIMER.reset();
-  disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON, RESET_GAME_BUTTON]);
-  const solution = template[nonogramSize][nonogramName];
+  disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
+  const solution = TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME];
   const gameCellsList = gameWrap.querySelectorAll(".game__cells");
   gameCellsList.forEach((cells) => {
     const row = solution[cells.dataset.cells];
     Array.from(cells.children).forEach((cell) => {
       const rowCell = row[cell.dataset.cell];
-
+      cell.classList.add("game__cell-unuse");
       if (rowCell === 1) {
         cell.classList.add("game__cell-fill");
       } else {
@@ -384,7 +388,7 @@ function createContainer(containerClass = "", need) {
 }
 
 function getGamePlace(nonogramSize, nonogramName) {
-  const pic = template[nonogramSize][nonogramName];
+  const pic = TEMPLATE[nonogramSize][nonogramName];
   const rows = [];
   const cols = [];
 
@@ -469,18 +473,21 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
   const selectLevels = document.createElement("div");
   selectLevels.className = `select select-levels`;
   const selectHeader = document.createElement("div");
-  selectHeader.className = "select__header";
+  selectHeader.className = "select__header select__header-levels";
   const selectCurrent = document.createElement("span");
-  selectCurrent.className = "select__current";
-  selectCurrent.textContent = `${nonogramSize}*${nonogramSize}`;
+  selectCurrent.className = "select__current select__current-levels";
+  selectCurrent.textContent = `${NONOGRAM_SIZE}*${NONOGRAM_SIZE}`;
+  selectCurrent.dataset.size = NONOGRAM_SIZE;
   const selectBody = document.createElement("div");
-  selectBody.className = "select__body";
+  selectBody.className = "select__body select__body-levels";
+
+  let size = NONOGRAM_SIZE;
 
   const selectGroup = document.createElement("ul");
-  selectGroup.className = "select__group";
-  for (let key in template) {
+  selectGroup.className = "select__group select__group-levels";
+  for (let key in TEMPLATE) {
     const selectLi = document.createElement("li");
-    selectLi.className = "select__option";
+    selectLi.className = "select__option select__option-levels";
     selectLi.textContent = `${key}*${key}`;
     selectLi.dataset.size = key;
     selectGroup.append(selectLi);
@@ -492,14 +499,12 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
 
   function selectHandler(e) {
     const target = e.target;
-    nonogramSize = target.dataset.size;
-    if (target.classList.contains("select__header")) {
-      selectBody.classList.toggle("select__body--show");
-    }
+    size = target.dataset.size;
+    selectBody.classList.toggle("select__body--show");
 
     if (target.classList.contains("select__option")) {
-      selectBody.classList.remove("select__body--show");
-      selectCurrent.textContent = `${nonogramSize}*${nonogramSize}`;
+      selectCurrent.textContent = `${size}*${size}`;
+      selectCurrent.dataset.size = size;
       Array.from(selectBody.querySelectorAll(".select__option")).forEach(
         (option) => option.classList.remove("select__option-current")
       );
@@ -509,15 +514,9 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
           el.remove();
         }
       });
-      const firstItem = Object.keys(template[target.dataset.size])[0];
+      const firstItem = Object.keys(TEMPLATE[size])[0];
 
-      if (TIMER_RUN) {
-        TIMER.stop();
-        TIMER_RUN = false;
-      }
-      TIMER.reset();
-      renderGame(nonogramSize, firstItem, gameWrap);
-      gameSelectContainer.append(createSelectStages(gameWrap, firstItem));
+      gameSelectContainer.append(createSelectStages(gameWrap, size, firstItem));
     }
   }
 
@@ -526,29 +525,31 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
   return selectLevels;
 }
 
-function createSelectStages(gameWrap, currentNonogramName = nonogramName) {
-  if (TIMER_RUN) {
-    TIMER.stop();
-    TIMER_RUN = false;
-  }
+function createSelectStages(
+  gameWrap,
+  currentNonogramSize = NONOGRAM_SIZE,
+  currentNonogramName = NONOGRAM_NAME
+) {
+  NONOGRAM_SIZE = currentNonogramSize;
   const selectStages = document.createElement("div");
   selectStages.className = `select select-stages`;
   const selectHeader = document.createElement("div");
-  selectHeader.className = "select__header";
+  selectHeader.className = "select__header select__header-stages";
   const selectCurrent = document.createElement("span");
-  selectCurrent.className = "select__current";
+  selectCurrent.className = "select__current select__current-stages";
   selectCurrent.textContent = currentNonogramName;
   const selectBody = document.createElement("div");
-  selectBody.className = "select__body";
+  selectBody.className = "select__body select__body-stages";
 
   const selectGroup = document.createElement("ul");
   selectGroup.className = "select__group";
-  selectGroup.dataset.size = nonogramSize;
-  for (let name in template[nonogramSize]) {
+  selectGroup.dataset.size = NONOGRAM_SIZE;
+  for (let name in TEMPLATE[NONOGRAM_SIZE]) {
     const selectOption = document.createElement("li");
-    selectOption.className = "select__option";
+    selectOption.className = "select__option select__option-stages";
     selectOption.textContent = name;
     selectOption.dataset.name = name;
+    selectOption.dataset.size = currentNonogramSize;
     selectGroup.append(selectOption);
   }
 
@@ -558,27 +559,25 @@ function createSelectStages(gameWrap, currentNonogramName = nonogramName) {
 
   function selectHandler(e) {
     const target = e.target;
-    nonogramSize = target.parentNode.dataset.size;
-    nonogramName = target.dataset.name;
-    if (target.classList.contains("select__header")) {
-      selectBody.classList.toggle("select__body--show");
-    }
+    selectBody.classList.toggle("select__body--show");
 
     if (target.classList.contains("select__option")) {
+      NONOGRAM_SIZE = target.dataset.size;
+      NONOGRAM_NAME = target.dataset.name;
       selectBody.classList.remove("select__body--show");
-      selectCurrent.textContent = nonogramName;
+      selectCurrent.textContent = NONOGRAM_NAME;
       Array.from(selectBody.querySelectorAll(".select__option")).forEach(
         (option) => option.classList.remove("select__option-current")
       );
       target.classList.add("select__option-current");
-      MATRIX = createMatrix(nonogramSize);
+      MATRIX = createMatrix(NONOGRAM_SIZE);
       if (TIMER_RUN) {
         TIMER.stop();
         TIMER_RUN = false;
       }
       TIMER.reset();
       activatedButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
-      renderGame(nonogramSize, nonogramName, gameWrap);
+      renderGame(NONOGRAM_SIZE, NONOGRAM_NAME, gameWrap);
     }
   }
 
@@ -702,7 +701,7 @@ function createMainContent() {
   gameTimerBlock.className = "timer";
   const { hours, minutes, seconds } = getTimer();
 
-  const gameContent = createGameSpace(nonogramSize, nonogramName);
+  const gameContent = createGameSpace(NONOGRAM_SIZE, NONOGRAM_NAME);
   const gameButtonsContainer = createContainer("game__buttons", false);
   const gameLevels = createSelectLevels(gameWrap, gameSelectContainer);
   const gameStages = createSelectStages(gameWrap);
@@ -739,7 +738,6 @@ function createMainContent() {
   gameTimerBlock.append(hours, minutes, seconds);
   gameTimer.append(gameTimerBlock);
   gameWrap.append(gameContent);
-  gameButtonsContainer.append();
   gameSelectContainer.append(gameLevels, gameStages);
   gameButtonsContainer.append(
     SAVE_BUTTON,
@@ -755,7 +753,27 @@ function createMainContent() {
     gameWrap,
     gameButtonsContainer
   );
-  main.append(gameContainer);
+  main.append(gameContainer);  
+
+  const bodyLevels = gameContainer.querySelector(".select__body-levels");
+  const bodyStages = gameContainer.querySelector(".select__body-stages");
+  
+  gameContainer.addEventListener("click", function(e) {
+    const target = e.target;
+    if (
+      !target.classList.contains("select__header-levels") &&
+      !target.classList.contains("select__current-levels")
+      ) {
+        bodyLevels.classList.remove("select__body--show");
+    }
+
+    if (
+      !target.classList.contains("select__header-stages") &&
+      !target.classList.contains("select__current-stages")
+    ) {
+      bodyStages.classList.remove("select__body--show");
+    }
+  });
 
   return main;
 }
