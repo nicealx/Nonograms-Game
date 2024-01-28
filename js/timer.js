@@ -13,6 +13,11 @@ export default class Timer {
     this.secondsElem.textContent = `0${this.seconds}`;
   }
 
+  update() {
+    this.minutesElem.textContent = `${this.minutes < 9 ? "0" + this.minutes : this.minutes }:`;
+    this.secondsElem.textContent = `${this.seconds < 9 ? "0" + this.seconds : this.seconds }`;
+  }
+
   start() {
     if (this.minutes < 9) {
       this.minutesElem.textContent = `0${this.minutes}:`;
@@ -26,12 +31,12 @@ export default class Timer {
     }
 
     this.timer = setInterval(() => {
-      this.update();
+      this.count();
     }, 1000);
     console.log("Timer started");
   }
 
-  update() {
+  count() {
     this.seconds++;
     if (this.seconds < 9) {
       this.secondsElem.textContent = `0${this.seconds}`;
@@ -41,8 +46,8 @@ export default class Timer {
       this.secondsElem.textContent = this.seconds;
     }
 
-    if (this.seconds >= 59) {
-      this.minutes++;
+    if (this.seconds >= 60) {
+      this.minutes += this.seconds / 60;
       this.seconds = 0;
       this.secondsElem.textContent = `0${this.seconds}`;
     }

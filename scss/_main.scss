@@ -8,6 +8,7 @@ p {
 }
 
 .body {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -238,5 +239,85 @@ p {
       text-align: center;
 
     }
+  }
+}
+
+.modal {
+  position: absolute;
+  max-width: 100vw;
+  max-height: 100vh;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease-in, visibility 0.3s ease-in-out;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 100;
+
+  &--show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &__overlay {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: lighten($bgc-dark, $amount: 50);
+    opacity: 0.5;
+    z-index: 1;
+  }
+
+  &__wrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width: 400px;
+    width: 100%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+  
+  &__container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    margin: 0 20px;
+    border-radius: 5px;
+    background-color: $bcg-light;
+  }
+
+  &__close {
+    cursor: pointer;
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      right: 0;
+      width: 100%;
+      height: 2px;
+      background-color: $bgc-dark;
+    }
+
+    &::before {
+      transform: rotate(-45deg);
+    }
+    &::after {
+      transform: rotate(45deg);
+    }
+  }
+
+  &__title {
+    text-align: center;
   }
 }

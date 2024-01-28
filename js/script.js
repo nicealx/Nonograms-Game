@@ -1,28 +1,22 @@
 import Timer from "./timer.js";
+import Button from "./button.js";
+import Modal from "./modal.js";
 
 const DOC = document.querySelector(".body");
-let MATRIX = [];
-let NONOGRAM_SIZE = 5;
-let NONOGRAM_NAME = "cup";
-let BODY = null;
-let GAME_CONTAINER = null;
-let GAME_WRAP = null;
+const GAME_CONTAINER = createContainer("game", true);
+const GAME_WRAP = document.createElement("div");
 const { MINUTES, SECONDS } = getTimer();
-
-let TIMER = null;
-let TIMER_RUN = false;
-
-let SAVE_BUTTON = null;
-let RANDOM_GAME_BUTTON = null;
-let CONTINUE_GAME_BUTTON = null;
-let RESET_GAME_BUTTON = null;
-let SOLUTION_BUTTON = null;
-
-sessionStorage.setItem("NONOGRAM_SIZE", 0);
-sessionStorage.setItem("NONOGRAM_NAME", "cup");
-
+const SAVE_BUTTON = new Button("Save game", "game").create();
+const RANDOM_GAME_BUTTON = new Button("Random game", "game").create();
+const SOLUTION_BUTTON = new Button("Solution", "game").create();
+const CONTINUE_GAME_BUTTON = new Button("Continue last game", "game").create();
+const RESET_GAME_BUTTON = new Button("Reset game", "game").create();
+const MODAL = new Modal("modal");
+const SOUND_CROSS = new Audio("./audio/cross.mp3");
+const SOUND_EMPTY = new Audio("./audio/empty.mp3");
+const SOUND_FILL = new Audio("./audio/fill.mp3");
+const SOUND_WON = new Audio("./audio/won.mp3");
 const DIFFICULTY = { 5: "easy", 10: "medium", 15: "hard" };
-
 const TEMPLATE = {
   5: {
     "cup": [
@@ -76,10 +70,16 @@ const TEMPLATE = {
     "five": new Array(15).fill(new Array(15).fill(1)),
   },
 };
-const SOUND_CROSS = new Audio("./audio/cross.mp3");
-const SOUND_EMPTY = new Audio("./audio/empty.mp3");
-const SOUND_FILL = new Audio("./audio/fill.mp3");
-const SOUND_WON = new Audio("./audio/won.mp3");
+
+let MATRIX = [];
+let NONOGRAM_SIZE = 5;
+let NONOGRAM_NAME = "cup";
+let BODY = null;
+let TIMER = new Timer(MINUTES, SECONDS, 0, 0, 0);
+let TIMER_RUN = false;
+
+sessionStorage.setItem("NONOGRAM_SIZE", 0);
+sessionStorage.setItem("NONOGRAM_NAME", "cup");
 
 class Link {
   constructor(name, link, classWhere) {
@@ -100,28 +100,53 @@ class Link {
   }
 }
 
-class Button {
-  constructor(name, classWhere) {
-    this.name = name;
-    this.classWhere = classWhere;
-  }
-
-  create() {
-    const btn = document.createElement("button");
-    btn.className = `${this.classWhere}__button`;
-    btn.textContent = this.name;
-    return btn;
-  }
-}
-
 function checkWin(matrix, currentPlace) {
   if (matrix.toString() === currentPlace.toString()) {
     console.log("Win");
     removeBodyListener([pickHandler], true);
     TIMER.stop();
+    TIMER_RUN = false;
     disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
     SOUND_WON.play();
+    const time = TIMER.current();
+    const timeWin = time[0] * 60 + time[1];
+
+    MODAL.update("You are win! Congratulation!", `${timeWin} seconds`);
+    MODAL.show();
+
+    const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
+    gameCellsList.forEach((cells) => {
+      Array.from(cells.children).forEach((cell) => {
+        cell.classList.add("game__cell-unuse");
+      });
+    });
   }
+}
+
+function fillCells(need = true) {
+  let place = null;
+  if (need) {
+    place = TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME];
+  } else {
+    place = MATRIX;
+  }
+  const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
+  gameCellsList.forEach((cells) => {
+    const row = place[cells.dataset.cells];
+    Array.from(cells.children).forEach((cell) => {
+      const rowCell = row[cell.dataset.cell];
+      if (need) {
+        cell.classList.add("game__cell-unuse");
+      } else {
+        cell.classList.remove("game__cell-unuse");
+      }
+      if (rowCell === 1) {
+        cell.classList.add("game__cell-fill");
+      } else {
+        cell.classList.remove("game__cell-fill");
+      }
+    });
+  });
 }
 
 function addMatrixElement(currentCellParent, currentCell, answer) {
@@ -142,20 +167,22 @@ function pickHandler(e) {
   const currentCellParent = target.parentNode.dataset.cells;
   let answer = 0;
   if (target.classList.contains("game__cell")) {
+    startGame();
     activatedButtons(RESET_GAME_BUTTON);
     if (button === 0) {
       if (target.classList.contains("game__cell-cross")) {
         target.classList.remove("game__cell-cross");
       }
       if (target.classList.contains("game__cell-fill")) {
+        target.classList.toggle("game__cell-fill");
         SOUND_EMPTY.play();
         deleteMatrixElement(currentCellParent, currentCell);
       } else {
+        target.classList.toggle("game__cell-fill");
         SOUND_FILL.play();
         answer = 1;
         addMatrixElement(currentCellParent, currentCell, answer);
       }
-      target.classList.toggle("game__cell-fill");
     }
 
     if (button === 2) {
@@ -243,25 +270,12 @@ function continueGame(gameSelectContainer) {
   MATRIX = save["matrix"];
   TIMER.stop();
   TIMER = new Timer(MINUTES, SECONDS, ...save["currentTimer"]);
-  TIMER.start();
-  TIMER_RUN = true;
+  TIMER.update();
   NONOGRAM_NAME = save["nonogramName"];
   NONOGRAM_SIZE = save["nonogramSize"];
   renderGame(NONOGRAM_SIZE, NONOGRAM_NAME, false);
 
-  const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
-  gameCellsList.forEach((cells) => {
-    const row = MATRIX[cells.dataset.cells];
-    Array.from(cells.children).forEach((cell) => {
-      const rowCell = row[cell.dataset.cell];
-      cell.classList.remove("game__cell-unuse");
-      if (rowCell === 1) {
-        cell.classList.add("game__cell-fill");
-      } else {
-        cell.classList.remove("game__cell-fill");
-      }
-    });
-  });
+  fillCells(false);
 
   Array.from(gameSelectContainer.children).forEach((el) => {
     el.remove();
@@ -291,24 +305,25 @@ function randomGame(gameSelectContainer, gameLevels, gameStages) {
   NONOGRAM_SIZE = arrMain[randomSize];
   NONOGRAM_NAME = arrSecond[randomName];
 
+  const currentLevelSelect = gameLevels.children[0].firstChild;
+  const levelsSelectOptions = gameLevels.querySelectorAll(".select__option");
+
+  Array.from(gameSelectContainer.querySelectorAll(".select__option")).forEach(
+    (option) => option.classList.remove("select__option-current")
+  );
+
+  Array.from(levelsSelectOptions).forEach((el) => {
+    if (el.dataset.size === arrMain[randomSize]) {
+      el.classList.add("select__option-current");
+    }
+  });
+
   if (
     sessionSize === arrMain[randomSize] &&
     sessionName === arrSecond[randomName]
   ) {
     return randomGame();
   } else {
-    const currentLevelSelect = gameLevels.children[0].firstChild;
-    const levelsSelectOptions = gameLevels.querySelectorAll(".select__option");
-
-    Array.from(gameSelectContainer.querySelectorAll(".select__option")).forEach(
-      (option) => option.classList.remove("select__option-current")
-    );
-
-    Array.from(levelsSelectOptions).forEach((el) => {
-      if (el.dataset.size === arrMain[randomSize]) {
-        el.classList.add("select__option-current");
-      }
-    });
     sessionStorage.setItem("NONOGRAM_SIZE", arrMain[randomSize]);
     sessionStorage.setItem("NONOGRAM_NAME", arrSecond[randomName]);
     currentLevelSelect.textContent = DIFFICULTY[arrMain[randomSize]];
@@ -343,20 +358,7 @@ function showSolution() {
   TIMER.reset();
   disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
   activatedButtons(RESET_GAME_BUTTON);
-  const solution = TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME];
-  const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
-  gameCellsList.forEach((cells) => {
-    const row = solution[cells.dataset.cells];
-    Array.from(cells.children).forEach((cell) => {
-      const rowCell = row[cell.dataset.cell];
-      cell.classList.add("game__cell-unuse");
-      if (rowCell === 1) {
-        cell.classList.add("game__cell-fill");
-      } else {
-        cell.classList.remove("game__cell-fill");
-      }
-    });
-  });
+  fillCells();
   removeBodyListener([pickHandler, startGame], false);
 }
 
@@ -688,10 +690,8 @@ function createMainContent() {
   const main = document.createElement("main");
   main.className = "main";
 
-  GAME_CONTAINER = createContainer("game", true);
   const gameSelectContainer = createContainer("game__select", false);
 
-  GAME_WRAP = document.createElement("div");
   GAME_WRAP.className = "game__wrap";
 
   const gameTimer = document.createElement("div");
@@ -703,14 +703,6 @@ function createMainContent() {
   const gameButtonsContainer = createContainer("game__buttons", false);
   const gameLevels = createSelectLevels(gameSelectContainer);
   const gameStages = createSelectStages();
-
-  SAVE_BUTTON = new Button("Save game", "game").create();
-  RANDOM_GAME_BUTTON = new Button("Random game", "game").create();
-  SOLUTION_BUTTON = new Button("Solution", "game").create();
-  CONTINUE_GAME_BUTTON = new Button("Continue last game", "game").create();
-  RESET_GAME_BUTTON = new Button("Reset game", "game").create();
-
-  TIMER = new Timer(MINUTES, SECONDS, 0, 0, 0);
 
   disabledButtons([SAVE_BUTTON, RESET_GAME_BUTTON]);
 
@@ -790,5 +782,5 @@ function createFooterContent() {
 }
 
 DOC.prepend(createFooterContent());
-DOC.prepend(createMainContent());
+DOC.prepend(createMainContent(), MODAL.init());
 DOC.prepend(createHeaderContent());
