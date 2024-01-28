@@ -76,6 +76,10 @@ const TEMPLATE = {
     "five": new Array(15).fill(new Array(15).fill(1)),
   },
 };
+const SOUND_CROSS = new Audio("./audio/cross.mp3");
+const SOUND_EMPTY = new Audio("./audio/empty.mp3");
+const SOUND_FILL = new Audio("./audio/fill.mp3");
+const SOUND_WON = new Audio("./audio/won.mp3");
 
 class Link {
   constructor(name, link, classWhere) {
@@ -116,6 +120,7 @@ function checkWin(matrix, currentPlace) {
     removeBodyListener([pickHandler], true);
     TIMER.stop();
     disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
+    SOUND_WON.play();
   }
 }
 
@@ -143,9 +148,10 @@ function pickHandler(e) {
         target.classList.remove("game__cell-cross");
       }
       if (target.classList.contains("game__cell-fill")) {
-        answer = 0;
+        SOUND_EMPTY.play();
         deleteMatrixElement(currentCellParent, currentCell);
       } else {
+        SOUND_FILL.play();
         answer = 1;
         addMatrixElement(currentCellParent, currentCell, answer);
       }
@@ -157,6 +163,19 @@ function pickHandler(e) {
         target.classList.remove("game__cell-fill");
         answer = 0;
         deleteMatrixElement(currentCellParent, currentCell);
+      }
+      if (
+        !target.classList.contains("game__cell-fill") &&
+        target.classList.contains("game__cell-cross")
+      ) {
+        SOUND_EMPTY.play();
+      }
+
+      if (
+        !target.classList.contains("game__cell-fill") &&
+        !target.classList.contains("game__cell-cross")
+      ) {
+        SOUND_CROSS.play();
       }
       target.classList.toggle("game__cell-cross");
     }
@@ -247,7 +266,7 @@ function continueGame(gameSelectContainer) {
   Array.from(gameSelectContainer.children).forEach((el) => {
     el.remove();
   });
-  activatedButtons([RESET_GAME_BUTTON, SAVE_BUTTON])
+  activatedButtons([RESET_GAME_BUTTON, SAVE_BUTTON]);
 
   gameSelectContainer.append(
     createSelectLevels(gameSelectContainer),
