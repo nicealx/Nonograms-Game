@@ -1,9 +1,14 @@
+import Timer from "./timer.js"
+
 const DOC = document.querySelector("body");
 let MATRIX = [];
 let NONOGRAM_SIZE = 5;
 let NONOGRAM_NAME = "cup";
 let BODY = null;
 let GAME_CONTAINER = null;
+let GAME_WRAP = null;
+const { HOURS, MINUTES, SECONDS } = getTimer();
+
 
 let TIMER = null;
 let TIMER_RUN = false;
@@ -16,6 +21,8 @@ let SOLUTION_BUTTON = null;
 
 sessionStorage.setItem("NONOGRAM_SIZE", 0);
 sessionStorage.setItem("NONOGRAM_NAME", "cup");
+
+const DIFFICULTY = { 5: "easy", 10: "medium", 15: "hard" };
 
 const TEMPLATE = {
   5: {
@@ -101,95 +108,6 @@ class Button {
     btn.className = `${this.classWhere}__button`;
     btn.textContent = this.name;
     return btn;
-  }
-}
-
-class Timer {
-  constructor(hoursElem, minutesElem, secondsElem, hours, minutes, seconds) {
-    this.hoursElem = hoursElem;
-    this.minutesElem = minutesElem;
-    this.secondsElem = secondsElem;
-    this.hours = hours;
-    this.minutes = minutes;
-    this.seconds = seconds;
-  }
-
-  reset() {
-    this.hours = 0;
-    this.minutes = 0;
-    this.seconds = 0;
-    this.hoursElem.textContent = `0${this.hours}:`;
-    this.minutesElem.textContent = `0${this.minutes}:`;
-    this.secondsElem.textContent = `0${this.seconds}`;
-  }
-
-  start() {
-    if (this.hours < 9) {
-      this.hoursElem.textContent = `0${this.hours}:`;
-    } else {
-      this.hoursElem.textContent = `${this.hours}:`;
-    }
-    if (this.minutes < 9) {
-      this.minutesElem.textContent = `0${this.minutes}:`;
-    } else {
-      this.minutesElem.textContent = `${this.minutes}:`;
-    }
-    if (this.seconds < 9) {
-      this.secondsElem.textContent = `0${this.seconds}`;
-    } else {
-      this.secondsElem.textContent = this.seconds;
-    }
-
-    this.timer = setInterval(() => {
-      this.update();
-    }, 1000);
-    console.log("Timer started");
-  }
-
-  update() {
-    this.seconds++;
-    if (this.seconds < 9) {
-      this.secondsElem.textContent = `0${this.seconds}`;
-    }
-
-    if (this.seconds > 9) {
-      this.secondsElem.textContent = this.seconds;
-    }
-
-    if (this.seconds >= 59) {
-      this.minutes++;
-      this.seconds = 0;
-      this.secondsElem.textContent = `0${this.seconds}`;
-    }
-
-    if (this.minutes < 9) {
-      this.minutesElem.textContent = `0${this.minutes}:`;
-    }
-    if (this.minutes > 9) {
-      this.minutesElem.textContent = `${this.minutes}:`;
-    }
-
-    if (this.minutes >= 59) {
-      this.hours++;
-      this.minutes = 0;
-      this.hoursElem.textContent = `${this.hours}:`;
-    }
-
-    if (this.hours < 9) {
-      this.hoursElem.textContent = `0${this.hours}:`;
-    }
-    if (this.hours > 9) {
-      this.hoursElem.textContent = `${this.hours}:`;
-    }
-
-    if (this.hours >= 99) {
-      this.stop();
-    }
-  }
-
-  stop() {
-    console.log("Timer stoped");
-    clearInterval(this.timer);
   }
 }
 
@@ -289,11 +207,50 @@ function activatedButtons(buttons) {
   }
 }
 
-function saveGame(gameWrap, gameSelectContainer) {
-  console.log(gameWrap, gameSelectContainer);
+function saveGame() {
+  const save = {
+    "currentTimer": TIMER.current(),
+    "matrix": MATRIX,
+    "nonogramName": NONOGRAM_NAME,
+    "nonogramSize": NONOGRAM_SIZE,
+  };
+
+  sessionStorage.setItem("save", JSON.stringify(save));
 }
 
-function randomGame(gameWrap, gameSelectContainer) {
+function continueGame(gameSelectContainer) {
+  const save = JSON.parse(sessionStorage.getItem("save"));
+  MATRIX = save["matrix"];
+  TIMER.stop();
+  TIMER = new Timer(HOURS, MINUTES, SECONDS, ...save["currentTimer"]);
+  TIMER.start();
+  TIMER_RUN = true;
+  NONOGRAM_NAME = save["nonogramName"];
+  NONOGRAM_SIZE = save["nonogramSize"];
+  renderGame(NONOGRAM_SIZE, NONOGRAM_NAME, false);
+  
+  const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
+  gameCellsList.forEach((cells) => {
+    const row = MATRIX[cells.dataset.cells];
+    Array.from(cells.children).forEach((cell) => {
+      const rowCell = row[cell.dataset.cell];
+      cell.classList.remove("game__cell-unuse");
+      if (rowCell === 1) {
+        cell.classList.add("game__cell-fill");
+      } else {
+        cell.classList.remove("game__cell-fill");
+      }
+    });
+  });
+
+  Array.from(gameSelectContainer.children).forEach((el) => {
+    el.remove();
+  });
+
+  gameSelectContainer.append(createSelectLevels(gameSelectContainer), createSelectStages(NONOGRAM_SIZE, NONOGRAM_NAME));
+}
+
+function randomGame(gameSelectContainer) {
   if (TIMER_RUN) {
     TIMER.stop();
     TIMER_RUN = false;
@@ -309,6 +266,7 @@ function randomGame(gameWrap, gameSelectContainer) {
   arrMain[randomSize] = Number(arrMain[randomSize]);
   NONOGRAM_SIZE = arrMain[randomSize];
   NONOGRAM_NAME = arrSecond[randomName];
+
   const levelsSelect = gameSelectContainer.querySelector(".select-levels");
   const currentLevelSelect = levelsSelect.querySelector(".select__current");
   const levelsSelectOptions = levelsSelect.querySelectorAll(".select__option");
@@ -331,21 +289,21 @@ function randomGame(gameWrap, gameSelectContainer) {
   } else {
     sessionStorage.setItem("NONOGRAM_SIZE", arrMain[randomSize]);
     sessionStorage.setItem("NONOGRAM_NAME", arrSecond[randomName]);
-    currentLevelSelect.textContent = `${arrMain[randomSize]}*${arrMain[randomSize]}`;
-    renderGame(arrMain[randomSize], arrSecond[randomName], gameWrap);
+    currentLevelSelect.textContent = DIFFICULTY[arrMain[randomSize]];
+    renderGame(arrMain[randomSize], arrSecond[randomName]);
     Array.from(gameSelectContainer.children).forEach((el) => {
       if (el.classList.contains("select-stages")) {
         el.remove();
       }
     });
-    // activatedButtons[RANDOM_GAME_BUTTON]
+
     disabledButtons([RESET_GAME_BUTTON, SAVE_BUTTON]);
-    gameSelectContainer.append(createSelectStages(gameWrap));
+    gameSelectContainer.append(createSelectStages());
   }
 }
 
-function resetGame(gameContent) {
-  Array.from(gameContent.querySelectorAll(".game__cell")).forEach((cell) => {
+function resetGame() {
+  Array.from(GAME_WRAP.querySelectorAll(".game__cell")).forEach((cell) => {
     cell.classList.remove("game__cell-fill");
     cell.classList.remove("game__cell-cross");
     cell.classList.remove("game__cell-unuse");
@@ -355,7 +313,7 @@ function resetGame(gameContent) {
   return;
 }
 
-function showSolution(gameWrap) {
+function showSolution() {
   if (TIMER_RUN) {
     TIMER.stop();
     TIMER_RUN = false;
@@ -363,7 +321,7 @@ function showSolution(gameWrap) {
   TIMER.reset();
   disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
   const solution = TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME];
-  const gameCellsList = gameWrap.querySelectorAll(".game__cells");
+  const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
   gameCellsList.forEach((cells) => {
     const row = solution[cells.dataset.cells];
     Array.from(cells.children).forEach((cell) => {
@@ -459,9 +417,9 @@ function createCluesList(clues, cluesClass) {
 
 function createMatrix(num) {
   MATRIX = [];
-  for (let i = 0; i < num; i++) {
+  for (let i = 0; i < Number(num); i++) {
     const temp = [];
-    for (let j = 0; j < num; j++) {
+    for (let j = 0; j < Number(num); j++) {
       temp[j] = 0;
     }
     MATRIX.push(temp);
@@ -470,14 +428,14 @@ function createMatrix(num) {
   return MATRIX;
 }
 
-function createSelectLevels(gameWrap, gameSelectContainer) {
+function createSelectLevels(gameSelectContainer) {
   const selectLevels = document.createElement("div");
   selectLevels.className = `select select-levels`;
   const selectHeader = document.createElement("div");
   selectHeader.className = "select__header select__header-levels";
   const selectCurrent = document.createElement("span");
   selectCurrent.className = "select__current select__current-levels";
-  selectCurrent.textContent = `${NONOGRAM_SIZE}*${NONOGRAM_SIZE}`;
+  selectCurrent.textContent = DIFFICULTY[NONOGRAM_SIZE];
   selectCurrent.dataset.size = NONOGRAM_SIZE;
   const selectBody = document.createElement("div");
   selectBody.className = "select__body select__body-levels";
@@ -489,7 +447,7 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
   for (let key in TEMPLATE) {
     const selectLi = document.createElement("li");
     selectLi.className = "select__option select__option-levels";
-    selectLi.textContent = `${key}*${key}`;
+    selectLi.textContent = DIFFICULTY[key];
     selectLi.dataset.size = key;
     selectGroup.append(selectLi);
     selectBody.append(selectGroup);
@@ -504,7 +462,7 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
     selectBody.classList.toggle("select__body--show");
 
     if (target.classList.contains("select__option")) {
-      selectCurrent.textContent = `${size}*${size}`;
+      selectCurrent.textContent = DIFFICULTY[size];
       selectCurrent.dataset.size = size;
       Array.from(selectBody.querySelectorAll(".select__option")).forEach(
         (option) => option.classList.remove("select__option-current")
@@ -517,7 +475,7 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
       });
       const firstItem = Object.keys(TEMPLATE[size])[0];
 
-      gameSelectContainer.append(createSelectStages(gameWrap, size, firstItem));
+      gameSelectContainer.append(createSelectStages(size, firstItem));
     }
   }
 
@@ -527,7 +485,6 @@ function createSelectLevels(gameWrap, gameSelectContainer) {
 }
 
 function createSelectStages(
-  gameWrap,
   currentNonogramSize = NONOGRAM_SIZE,
   currentNonogramName = NONOGRAM_NAME
 ) {
@@ -577,8 +534,8 @@ function createSelectStages(
         TIMER_RUN = false;
       }
       TIMER.reset();
-      activatedButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
-      renderGame(NONOGRAM_SIZE, NONOGRAM_NAME, gameWrap);
+      activatedButtons(SOLUTION_BUTTON);
+      renderGame(NONOGRAM_SIZE, NONOGRAM_NAME);
     }
   }
 
@@ -588,7 +545,7 @@ function createSelectStages(
     const target = e.target;
     const bodyLevels = GAME_CONTAINER.querySelector(".select__body-levels");
     const bodyStages = GAME_CONTAINER.querySelector(".select__body-stages");
-    
+
     if (
       !target.classList.contains("select__header-levels") &&
       !target.classList.contains("select__current-levels")
@@ -608,17 +565,17 @@ function createSelectStages(
 }
 
 function getTimer() {
-  const hours = document.createElement("span");
-  hours.className = "timer__hours";
-  hours.textContent = "00:";
-  const minutes = document.createElement("span");
-  minutes.className = "timer__minutes";
-  minutes.textContent = "00:";
-  const seconds = document.createElement("span");
-  seconds.className = "timer__seconds";
-  seconds.textContent = "00";
+  const HOURS = document.createElement("span");
+  HOURS.className = "timer__hours";
+  HOURS.textContent = "00:";
+  const MINUTES = document.createElement("span");
+  MINUTES.className = "timer__minutes";
+  MINUTES.textContent = "00:";
+  const SECONDS = document.createElement("span");
+  SECONDS.className = "timer__seconds";
+  SECONDS.textContent = "00";
 
-  return { hours, minutes, seconds };
+  return { HOURS, MINUTES, SECONDS };
 }
 
 function createPlace(nonogramSize, nonogramName) {
@@ -664,14 +621,16 @@ function createPlace(nonogramSize, nonogramName) {
   return place;
 }
 
-function createGameSpace(nonogramSize, nonogramName) {
+function createGameSpace(nonogramSize, nonogramName, newMatrix = true) {
   const game = document.createElement("div");
   game.className = "game__content";
   const title = document.createElement("h2");
   title.className = "game__title";
   title.textContent = nonogramName;
   let gamePlace = createPlace(nonogramSize, nonogramName);
-  MATRIX = createMatrix(nonogramSize);
+  if (newMatrix) {
+    MATRIX = createMatrix(nonogramSize);
+  }
 
   game.append(title, gamePlace);
 
@@ -693,11 +652,10 @@ function createHeaderContent() {
   const menu = document.createElement("ul");
   menu.className = "header__menu menu";
 
-  const newGame = new Link("New game", "#", "menu").create();
   const scoreLink = new Link("Score", "#", "menu").create();
   const theme = new Link("Theme", "#", "menu").create();
 
-  menu.append(newGame, scoreLink, theme);
+  menu.append(scoreLink, theme);
 
   content.append(logo, menu);
   container.append(content);
@@ -713,19 +671,18 @@ function createMainContent() {
   GAME_CONTAINER = createContainer("game", true);
   const gameSelectContainer = createContainer("game__select", false);
 
-  const gameWrap = document.createElement("div");
-  gameWrap.className = "game__wrap";
+  GAME_WRAP = document.createElement("div");
+  GAME_WRAP.className = "game__wrap";
 
   const gameTimer = document.createElement("div");
   gameTimer.className = "game__timer";
   const gameTimerBlock = document.createElement("p");
   gameTimerBlock.className = "timer";
-  const { hours, minutes, seconds } = getTimer();
 
   const gameContent = createGameSpace(NONOGRAM_SIZE, NONOGRAM_NAME);
   const gameButtonsContainer = createContainer("game__buttons", false);
-  const gameLevels = createSelectLevels(gameWrap, gameSelectContainer);
-  const gameStages = createSelectStages(gameWrap);
+  const gameLevels = createSelectLevels(gameSelectContainer);
+  const gameStages = createSelectStages();
 
   SAVE_BUTTON = new Button("Save game", "game").create();
   RANDOM_GAME_BUTTON = new Button("Random game", "game").create();
@@ -733,32 +690,38 @@ function createMainContent() {
   CONTINUE_GAME_BUTTON = new Button("Continue game", "game").create();
   RESET_GAME_BUTTON = new Button("Reset game", "game").create();
 
-  TIMER = new Timer(hours, minutes, seconds, 0, 0, 0);
+  TIMER = new Timer(HOURS, MINUTES, SECONDS, 0, 0, 0);
 
   disabledButtons([SAVE_BUTTON, RESET_GAME_BUTTON]);
+
   SAVE_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
-    saveGame(gameWrap, gameSelectContainer);
+    saveGame(gameSelectContainer);
+  });
+
+  CONTINUE_GAME_BUTTON.addEventListener("click", (e) => {
+    e.preventDefault();
+    continueGame(gameSelectContainer);
   });
 
   RANDOM_GAME_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
-    randomGame(gameWrap, gameSelectContainer);
+    randomGame(gameSelectContainer);
   });
 
   SOLUTION_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
-    showSolution(gameWrap);
+    showSolution();
   });
 
   RESET_GAME_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
-    resetGame(gameWrap);
+    resetGame();
   });
 
-  gameTimerBlock.append(hours, minutes, seconds);
+  gameTimerBlock.append(HOURS, MINUTES, SECONDS);
   gameTimer.append(gameTimerBlock);
-  gameWrap.append(gameContent);
+  GAME_WRAP.append(gameContent);
   gameSelectContainer.append(gameLevels, gameStages);
   gameButtonsContainer.append(
     SAVE_BUTTON,
@@ -771,7 +734,7 @@ function createMainContent() {
   GAME_CONTAINER.append(
     gameSelectContainer,
     gameTimer,
-    gameWrap,
+    GAME_WRAP,
     gameButtonsContainer
   );
   main.append(GAME_CONTAINER);
@@ -779,12 +742,12 @@ function createMainContent() {
   return main;
 }
 
-function renderGame(nonogramSize, nonogramName, gameWrap) {
-  const game = createGameSpace(nonogramSize, nonogramName);
-  Array.from(gameWrap.children).forEach((el) => {
+function renderGame(nonogramSize, nonogramName, newMatrix) {
+  const game = createGameSpace(nonogramSize, nonogramName, newMatrix);
+  Array.from(GAME_WRAP.children).forEach((el) => {
     el.remove();
   });
-  gameWrap.append(game);
+  GAME_WRAP.append(game);
 }
 
 function createFooterContent() {
