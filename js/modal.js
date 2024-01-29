@@ -13,15 +13,15 @@ export default class Modal {
   }
 
   init() {
-    this.modal.className = `${this.className}`;
-    this.overlay.className = `${this.className}__overlay`;
-    this.wrap.className = `${this.className}__wrap`;
-    this.container.className = `${this.className}__container`;
-    this.content.className = `${this.className}__content`;
-    this.title.className = `${this.className}__title`;
-    this.text.className = `${this.className}__text`;
-    this.time.className = `${this.className}__time`;
-    this.close.className = `${this.className}__close`;
+    this.modal.className = `modal ${this.className}`;
+    this.overlay.className = `modal__overlay`;
+    this.wrap.className = `modal__wrap`;
+    this.container.className = `modal__container`;
+    this.content.className = `modal__content`;
+    this.title.className = `modal__title`;
+    this.text.className = `modal__text`;
+    this.time.className = `modal__time`;
+    this.close.className = `modal__close`;
 
     this.content.append(this.text, this.time);
     this.container.append(
@@ -39,22 +39,28 @@ export default class Modal {
   event() {
     this.modal.addEventListener("click", () => {
       this.hide();
-      this.clear();
+      setTimeout(() => {
+        this.clear();
+      }, 300);
     });
   }
 
   update(title, content, time) {
-    this.title.textContent = title.trim();
-    this.text.textContent = content.trim();
-    this.time.textContent = time.trim();
+    this.title.textContent = title;
+    if(typeof content === "object") {
+      this.content.replaceWith(this.text.textContent, content);
+    } else {
+      this.text.textContent = content;
+      this.time.textContent = time;
+    }
   }
 
   show() {
-    this.modal.classList.add(`${this.className}--show`);
+    this.modal.classList.add(`modal--show`);
   }
 
   hide() {
-    this.modal.classList.remove(`${this.className}--show`);
+    this.modal.classList.remove(`modal--show`);
   }
 
   clear() {

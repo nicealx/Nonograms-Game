@@ -11,43 +11,44 @@ const RANDOM_GAME_BUTTON = new Button("Random game", "game").create();
 const SOLUTION_BUTTON = new Button("Solution", "game").create();
 const CONTINUE_GAME_BUTTON = new Button("Continue last game", "game").create();
 const RESET_GAME_BUTTON = new Button("Reset game", "game").create();
-const MODAL = new Modal("modal");
+const MODAL_WIN = new Modal("modal-win");
+const MODAL_SCORE = new Modal("modal-score");
 const SOUND_CROSS = new Audio("./audio/cross.mp3");
 const SOUND_EMPTY = new Audio("./audio/empty.mp3");
 const SOUND_FILL = new Audio("./audio/fill.mp3");
 const SOUND_WON = new Audio("./audio/won.mp3");
-const DIFFICULTY = { 5: "easy", 10: "medium", 15: "hard" };
+const DIFFICULTY = { 5: "Easy", 10: "Medium", 15: "Hard" };
 const TEMPLATE = {
   5: {
-    "goblet": [
+    "Goblet": [
       [0, 1, 1, 1, 0],
       [0, 1, 1, 1, 0],
       [0, 0, 1, 0, 0],
       [0, 0, 1, 0, 0],
       [0, 1, 1, 1, 0],
     ],
-    "flight": [
+    "Flight": [
       [1, 1, 1, 1, 1],
       [0, 0, 1, 0, 0],
       [1, 1, 1, 1, 1],
       [0, 1, 1, 1, 0],
       [0, 0, 1, 0, 0],
     ],
-    "mask": [
+    "Mask": [
       [1, 1, 1, 1, 1],
       [1, 0, 1, 0, 1],
       [1, 1, 1, 1, 1],
       [0, 1, 1, 1, 0],
       [0, 0, 1, 0, 0],
     ],
-    "note": [
+    "Note": [
       [0, 1, 1, 1, 1],
       [0, 1, 0, 0, 1],
       [0, 1, 0, 0, 1],
       [1, 1, 0, 1, 1],
       [1, 1, 0, 1, 1],
     ],
-    "smile": [
+    "Smile": [
       [1, 1, 0, 1, 1],
       [1, 1, 0, 1, 1],
       [0, 0, 0, 0, 0],
@@ -56,7 +57,7 @@ const TEMPLATE = {
     ],
   },
   10: {
-    "scull": [
+    "Scull": [
       [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
       [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -68,7 +69,7 @@ const TEMPLATE = {
       [0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
       [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
     ],
-    "camel": [
+    "Camel": [
       [0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
       [0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
       [0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
@@ -80,7 +81,7 @@ const TEMPLATE = {
       [0, 1, 1, 0, 0, 1, 1, 0, 0, 0],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ],
-    "cat": [
+    "Cat": [
       [0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
       [0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
       [1, 0, 1, 1, 1, 0, 0, 0, 0, 0],
@@ -92,7 +93,7 @@ const TEMPLATE = {
       [0, 1, 1, 0, 1, 1, 1, 0, 1, 1],
       [1, 1, 0, 1, 1, 1, 1, 1, 1, 0],
     ],
-    "cup": [
+    "Cup": [
       [0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
       [0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -104,7 +105,7 @@ const TEMPLATE = {
       [1, 0, 1, 1, 1, 1, 1, 0, 0, 1],
       [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
     ],
-    "duck": [
+    "Duck": [
       [0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
       [0, 1, 0, 1, 1, 0, 0, 0, 0, 0],
       [1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
@@ -118,7 +119,7 @@ const TEMPLATE = {
     ],
   },
   15: {
-    "squirrel": [
+    "Squirrel": [
       [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
       [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0],
@@ -135,7 +136,7 @@ const TEMPLATE = {
       [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
     ],
-    "fish": [
+    "Fish": [
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -152,7 +153,7 @@ const TEMPLATE = {
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
-    "mushroom": [
+    "Mushroom": [
       [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
       [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
       [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0],
@@ -169,7 +170,7 @@ const TEMPLATE = {
       [0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0],
       [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
     ],
-    "apple": [
+    "Apple": [
       [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
       [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
@@ -186,7 +187,7 @@ const TEMPLATE = {
       [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ],
-    "penguin": [
+    "Penguin": [
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
@@ -208,14 +209,14 @@ const TEMPLATE = {
 
 let MATRIX = [];
 let NONOGRAM_SIZE = 5;
-let NONOGRAM_NAME = "goblet";
+let NONOGRAM_NAME = "Goblet";
 let BODY_GAME;
 let TIMER = new Timer(MINUTES, SECONDS, 0, 0, 0);
 let TIMER_RUN = false;
 let SAVE_CURRENT_GAME;
 let LOAD_CURRENT_GAME = JSON.parse(localStorage.getItem("SAVE_CURRENT_GAME"));
-let SAVE_SCORE_GAME;
 let LOAD_SCORE_GAME = JSON.parse(localStorage.getItem("SAVE_SCORE_GAME"));
+let SAVE_SCORE_GAME = LOAD_SCORE_GAME ? LOAD_SCORE_GAME : [];
 
 localStorage.setItem("NONOGRAM_SIZE", 0);
 localStorage.setItem("NONOGRAM_NAME", "cup");
@@ -248,6 +249,7 @@ function formatGameMatrix() {
 function checkWin() {
   const matrix = formatGameMatrix();
   if (matrix.toString() === TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME].toString()) {
+    saveScore();
     removeBodyListener([pickHandler], true);
     TIMER.stop();
     TIMER_RUN = false;
@@ -256,12 +258,12 @@ function checkWin() {
     const time = TIMER.current();
     const timeWin = time[0] * 60 + time[1];
 
-    MODAL.update(
+    MODAL_WIN.update(
       "Great!",
       "You have solved the nonogram in",
       `${timeWin} seconds`
     );
-    MODAL.show();
+    MODAL_WIN.show();
 
     const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
     gameCellsList.forEach((cells) => {
@@ -409,15 +411,57 @@ function activatedButtons(buttons) {
 }
 
 function saveScore() {
-  SAVE_SCORE_GAME = {
-    "currentTimer": TIMER.current(),
-    "matrix": MATRIX,
-    "nonogramName": NONOGRAM_NAME,
-    "nonogramSize": NONOGRAM_SIZE,
-    "gameTime": new Date(),
-  };
+  SAVE_SCORE_GAME.push({
+    "Name": NONOGRAM_NAME,
+    "Difficulty": DIFFICULTY[NONOGRAM_SIZE],
+    "Time": TIMER.current(),
+  });
 
-  localStorage.setItem("SAVE_SCORE_GAME", JSON.stringify(SAVE_CURRENT_GAME));
+  localStorage.setItem("SAVE_SCORE_GAME", JSON.stringify(SAVE_SCORE_GAME));
+}
+
+function createScoreTable() {
+  console.log(SAVE_SCORE_GAME.length )
+  if(SAVE_SCORE_GAME.length !== 0) {
+    SAVE_SCORE_GAME.sort((a, b) => {
+      return (a["Time"][0] * 60 + a["Time"][1]) - (b["Time"][0] * 60 + b["Time"][1]);
+    }).length = 5;
+  
+    const table = document.createElement("table");
+  
+    for (let i = 0; i < 1; i++) {
+      const tr = document.createElement("tr");
+      let th = document.createElement("th");
+      th.textContent = "№";
+      tr.append(th);
+      for (let j = 0; j < Object.keys(SAVE_SCORE_GAME[i]).length; j++) {
+        th = document.createElement("th");
+        th.textContent = Object.keys(SAVE_SCORE_GAME[i])[j];
+        tr.append(th);
+      }
+      table.append(tr);
+    }
+  
+    SAVE_SCORE_GAME.forEach((save, i) => {
+      const tr = document.createElement("tr");
+      let td = document.createElement("td");
+      td.textContent = i + 1;
+      tr.append(td);
+      Object.keys(save).forEach((item) => {
+        td = document.createElement("td");
+        td.textContent = Array.isArray(save[item])
+          ? `${save[item][0]}:${
+              save[item][1] < 9 ? "0" + save[item][1] : save[item][1]
+            }`
+          : save[item];
+        tr.append(td);
+      });
+      table.append(tr);
+    });
+    MODAL_SCORE.update("Score", table);
+  } else {
+    MODAL_SCORE.update("Score", "Score table is empty.");
+  }
 }
 
 function saveGame() {
@@ -508,7 +552,8 @@ function randomGame(gameSelectContainer, gameLevels) {
       }
     });
 
-    disabledButtons([RESET_GAME_BUTTON, SAVE_BUTTON]);
+    activatedButtons([SOLUTION_BUTTON]);
+    disabledButtons([SAVE_BUTTON]);
     gameSelectContainer.append(createSelectStages());
   }
 }
@@ -528,6 +573,9 @@ function resetGame() {
   );
   addBodyListener([pickHandler, startGame]);
   MATRIX = createMatrix(NONOGRAM_SIZE);
+  activatedButtons([SOLUTION_BUTTON]);
+  disabledButtons([RESET_GAME_BUTTON]);
+
   return;
 }
 
@@ -863,6 +911,12 @@ function createHeaderContent() {
   const scoreLink = new Link("Score", "#", "menu").create();
   const theme = new Link("Theme", "#", "menu").create();
 
+  scoreLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    createScoreTable();
+    MODAL_SCORE.show();
+  });
+
   menu.append(scoreLink, theme);
 
   content.append(logo, menu);
@@ -972,5 +1026,5 @@ function createFooterContent() {
 }
 
 DOC.prepend(createFooterContent());
-DOC.prepend(createMainContent(), MODAL.init());
+DOC.prepend(createMainContent(), MODAL_WIN.init(), MODAL_SCORE.init());
 DOC.prepend(createHeaderContent());
