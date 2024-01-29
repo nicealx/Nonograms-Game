@@ -264,6 +264,7 @@ p {
   -webkit-box-pack: end;
       -ms-flex-pack: end;
           justify-content: flex-end;
+  padding-bottom: 5px;
   border: 0.5px solid grey;
 }
 .clues__top-item-border {
@@ -281,8 +282,6 @@ p {
           align-items: flex-end;
   width: 40px;
   height: 40px;
-  padding: 5px;
-  border: 0.5px solid grey;
 }
 .clues__left {
   display: -webkit-box;
@@ -316,6 +315,7 @@ p {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
+  padding-right: 5px;
   border: 0.5px solid grey;
 }
 .clues__left-item-border {
@@ -333,8 +333,6 @@ p {
           align-items: center;
   width: 40px;
   height: 40px;
-  padding: 5px;
-  border: 0.5px solid grey;
 }
 
 .modal {

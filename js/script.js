@@ -79,6 +79,8 @@ let TIMER = new Timer(MINUTES, SECONDS, 0, 0, 0);
 let TIMER_RUN = false;
 let SAVE_CURRENT_GAME;
 let LOAD_CURRENT_GAME = JSON.parse(localStorage.getItem("SAVE_CURRENT_GAME"));
+let SAVE_SCORE_GAME;
+let LOAD_SCORE_GAME = JSON.parse(localStorage.getItem("SAVE_SCORE_GAME"));
 
 localStorage.setItem("NONOGRAM_SIZE", 0);
 localStorage.setItem("NONOGRAM_NAME", "cup");
@@ -102,9 +104,15 @@ class Link {
   }
 }
 
-function checkWin(matrix, currentPlace) {
-  if (matrix.toString() === currentPlace.toString()) {
-    console.log("Win");
+function formatGameMatrix() {
+  return MATRIX.map((cells) => {
+    return cells.map((cell) => cell === 2 ? 0 : cell)
+  })
+}
+
+function checkWin() {
+  const matrix = formatGameMatrix();
+  if (matrix.toString() === TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME].toString()) {
     removeBodyListener([pickHandler], true);
     TIMER.stop();
     TIMER_RUN = false;
@@ -151,18 +159,24 @@ function fillCells(need = true) {
       } else {
         cell.firstChild.classList.remove("game__cell-fill");
       }
+
+      if (rowCell === 2) {
+        cell.firstChild.classList.add("game__cell-cross");
+      } else {
+        cell.firstChild.classList.remove("game__cell-cross");
+      }
     });
   });
 }
 
 function addMatrixElement(currentCellParent, currentCell, answer) {
   MATRIX[currentCellParent][currentCell] = answer;
-  checkWin(MATRIX, TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME]);
+  checkWin();
 }
 
 function deleteMatrixElement(currentCellParent, currentCell) {
   MATRIX[currentCellParent][currentCell] = 0;
-  checkWin(MATRIX, TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME]);
+  checkWin();
 }
 
 function pickHandler(e) {
@@ -194,17 +208,21 @@ function pickHandler(e) {
     if (button === 2) {
       if (target.classList.contains("game__cell-fill")) {
         target.classList.remove("game__cell-fill");
-        answer = 0;
         target.classList.add("game__cell-cross");
         SOUND_CROSS.play();
-        return deleteMatrixElement(currentCellParent, currentCell);
+        answer = 2;
+        return addMatrixElement(currentCellParent, currentCell, answer);
       }
       if (target.classList.contains("game__cell-cross")) {
         SOUND_EMPTY.play();
         target.classList.remove("game__cell-cross");
+        answer = 0;
+        return addMatrixElement(currentCellParent, currentCell, answer);
       } else {
         SOUND_CROSS.play();
         target.classList.add("game__cell-cross");
+        answer = 2;
+        return addMatrixElement(currentCellParent, currentCell, answer);
       }
     }
   }
@@ -255,13 +273,25 @@ function activatedButtons(buttons) {
   }
 }
 
+function saveScore() {
+  SAVE_SCORE_GAME = {
+    "currentTimer": TIMER.current(),
+    "matrix": MATRIX,
+    "nonogramName": NONOGRAM_NAME,
+    "nonogramSize": NONOGRAM_SIZE,
+    "gameTime": new Date(),
+  };
+
+  localStorage.setItem("SAVE_SCORE_GAME", JSON.stringify(SAVE_CURRENT_GAME));
+}
+
 function saveGame() {
   SAVE_CURRENT_GAME = {
     "currentTimer": TIMER.current(),
     "matrix": MATRIX,
     "nonogramName": NONOGRAM_NAME,
     "nonogramSize": NONOGRAM_SIZE,
-    "gameTime": new Date(),
+    "gameTime": new Date().getTime(),
   };
   activatedButtons(CONTINUE_GAME_BUTTON);
 
@@ -270,25 +300,31 @@ function saveGame() {
 
 function continueGame(gameSelectContainer) {
   LOAD_CURRENT_GAME = JSON.parse(localStorage.getItem("SAVE_CURRENT_GAME"));
-  MATRIX = LOAD_CURRENT_GAME["matrix"];
-  TIMER.stop();
-  TIMER = new Timer(MINUTES, SECONDS, ...LOAD_CURRENT_GAME["currentTimer"]);
-  TIMER.update();
-  NONOGRAM_NAME = LOAD_CURRENT_GAME["nonogramName"];
-  NONOGRAM_SIZE = LOAD_CURRENT_GAME["nonogramSize"];
-  renderGame(NONOGRAM_SIZE, NONOGRAM_NAME, false);
+  const check = LOAD_CURRENT_GAME["gameTime"] ? true : false;
 
-  fillCells(false);
+  if (check) {
+    MATRIX = LOAD_CURRENT_GAME["matrix"];
+    TIMER.stop();
+    TIMER = new Timer(MINUTES, SECONDS, ...LOAD_CURRENT_GAME["currentTimer"]);
+    TIMER.update();
+    NONOGRAM_NAME = LOAD_CURRENT_GAME["nonogramName"];
+    NONOGRAM_SIZE = LOAD_CURRENT_GAME["nonogramSize"];
+    renderGame(NONOGRAM_SIZE, NONOGRAM_NAME, false);
 
-  Array.from(gameSelectContainer.children).forEach((el) => {
-    el.remove();
-  });
-  activatedButtons([RESET_GAME_BUTTON, SAVE_BUTTON]);
+    fillCells(false);
 
-  gameSelectContainer.append(
-    createSelectLevels(gameSelectContainer),
-    createSelectStages(NONOGRAM_SIZE, NONOGRAM_NAME)
-  );
+    Array.from(gameSelectContainer.children).forEach((el) => {
+      el.remove();
+    });
+    activatedButtons([RESET_GAME_BUTTON, SAVE_BUTTON]);
+
+    gameSelectContainer.append(
+      createSelectLevels(gameSelectContainer),
+      createSelectStages(NONOGRAM_SIZE, NONOGRAM_NAME)
+    );
+  } else {
+    return;
+  }
 }
 
 function randomGame(gameSelectContainer, gameLevels) {
