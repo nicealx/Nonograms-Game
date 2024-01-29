@@ -246,9 +246,13 @@ p {
     }
 
     &-num {
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
       width: $size-cell;
       height: $size-cell;
+      padding: 5px;
+      border: 0.5px solid $color-border;
     }
   }
 
@@ -274,9 +278,13 @@ p {
     }
 
     &-num {
-      text-align: center;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
       width: $size-cell;
       height: $size-cell;
+      padding: 5px;
+      border: 0.5px solid $color-border;
     }
   }
 }

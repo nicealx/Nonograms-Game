@@ -182,35 +182,27 @@ function pickHandler(e) {
       if (target.classList.contains("game__cell-fill")) {
         target.classList.toggle("game__cell-fill");
         SOUND_EMPTY.play();
-        deleteMatrixElement(currentCellParent, currentCell);
+        return deleteMatrixElement(currentCellParent, currentCell);
       } else {
         target.classList.toggle("game__cell-fill");
         SOUND_FILL.play();
         answer = 1;
-        addMatrixElement(currentCellParent, currentCell, answer);
+        return addMatrixElement(currentCellParent, currentCell, answer);
       }
     }
 
     if (button === 2) {
-      if (target.classList.contains("game__cell-fill") &&
-      !target.classList.contains("game__cell-cross")) {
+      if (target.classList.contains("game__cell-fill")) {
         target.classList.remove("game__cell-fill");
         answer = 0;
         target.classList.add("game__cell-cross");
-        deleteMatrixElement(currentCellParent, currentCell);
+        SOUND_CROSS.play();
+        return deleteMatrixElement(currentCellParent, currentCell);
       }
-      if (
-        !target.classList.contains("game__cell-fill") &&
-        target.classList.contains("game__cell-cross")
-      ) {
+      if (target.classList.contains("game__cell-cross")) {
         SOUND_EMPTY.play();
         target.classList.remove("game__cell-cross");
-      }
-
-      if (
-        !target.classList.contains("game__cell-fill") &&
-        !target.classList.contains("game__cell-cross")
-      ) {
+      } else {
         SOUND_CROSS.play();
         target.classList.add("game__cell-cross");
       }
@@ -351,6 +343,11 @@ function randomGame(gameSelectContainer, gameLevels) {
 }
 
 function resetGame() {
+  if (TIMER_RUN) {
+    TIMER.stop();
+    TIMER_RUN = false;
+  }
+  TIMER.reset();
   Array.from(GAME_WRAP.querySelectorAll(".game__cell-inner")).forEach(
     (cell) => {
       cell.classList.remove("game__cell-fill");
@@ -431,25 +428,28 @@ function getGamePlace() {
 function createCluesList(clues, cluesClass) {
   const div = document.createElement("div");
   div.className = `game__clues clues__${cluesClass}`;
+  const maxQuantity = clues.reduce((acc, item) => {
+    if (item.length > acc) {
+      acc = item.length;
+      return acc;
+    } else {
+      return acc;
+    }
+  }, 0);
 
-  clues.forEach((clue, i) => {
+  clues.forEach((_, i) => {
     const divSecond = document.createElement("div");
     divSecond.className = `clues__${cluesClass}-item`;
     if ((i + 1) % 5 === 0) {
       divSecond.classList.add(`clues__${cluesClass}-item-border`);
     }
-    if (clue.length === 0) {
+
+    for (let j = 0; j < maxQuantity; j++) {
       const p = document.createElement("p");
       p.className = `clues__${cluesClass}-num`;
-      p.innerHTML = "&nbsp;";
-      divSecond.append(p);
+      p.textContent = clues[i][j];
+      divSecond.prepend(p);
     }
-    clue.forEach((n) => {
-      const p = document.createElement("p");
-      p.className = `clues__${cluesClass}-num`;
-      p.textContent = n;
-      divSecond.append(p);
-    });
     div.append(divSecond);
   });
 

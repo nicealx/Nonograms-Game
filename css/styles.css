@@ -270,9 +270,19 @@ p {
   border-right: 2px solid grey;
 }
 .clues__top-num {
-  text-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
   width: 40px;
   height: 40px;
+  padding: 5px;
+  border: 0.5px solid grey;
 }
 .clues__left {
   display: -webkit-box;
@@ -312,9 +322,19 @@ p {
   border-bottom: 2px solid grey;
 }
 .clues__left-num {
-  text-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   width: 40px;
   height: 40px;
+  padding: 5px;
+  border: 0.5px solid grey;
 }
 
 .modal {
