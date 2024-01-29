@@ -74,12 +74,14 @@ const TEMPLATE = {
 let MATRIX = [];
 let NONOGRAM_SIZE = 5;
 let NONOGRAM_NAME = "cup";
-let BODY = null;
+let BODY_GAME;
 let TIMER = new Timer(MINUTES, SECONDS, 0, 0, 0);
 let TIMER_RUN = false;
+let SAVE_CURRENT_GAME;
+let LOAD_CURRENT_GAME = JSON.parse(localStorage.getItem("SAVE_CURRENT_GAME"));
 
-sessionStorage.setItem("NONOGRAM_SIZE", 0);
-sessionStorage.setItem("NONOGRAM_NAME", "cup");
+localStorage.setItem("NONOGRAM_SIZE", 0);
+localStorage.setItem("NONOGRAM_NAME", "cup");
 
 class Link {
   constructor(name, link, classWhere) {
@@ -111,13 +113,17 @@ function checkWin(matrix, currentPlace) {
     const time = TIMER.current();
     const timeWin = time[0] * 60 + time[1];
 
-    MODAL.update("You are win! Congratulation!", `${timeWin} seconds`);
+    MODAL.update(
+      "Great!",
+      "You have solved the nonogram in",
+      `${timeWin} seconds`
+    );
     MODAL.show();
 
     const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
     gameCellsList.forEach((cells) => {
       Array.from(cells.children).forEach((cell) => {
-        cell.classList.add("game__cell-unuse");
+        cell.firstChild.classList.add("game__cell-unuse");
       });
     });
   }
@@ -134,16 +140,16 @@ function fillCells(need = true) {
   gameCellsList.forEach((cells) => {
     const row = place[cells.dataset.cells];
     Array.from(cells.children).forEach((cell) => {
-      const rowCell = row[cell.dataset.cell];
+      const rowCell = row[cell.firstChild.dataset.cell];
       if (need) {
-        cell.classList.add("game__cell-unuse");
+        cell.firstChild.classList.add("game__cell-unuse");
       } else {
-        cell.classList.remove("game__cell-unuse");
+        cell.firstChild.classList.remove("game__cell-unuse");
       }
       if (rowCell === 1) {
-        cell.classList.add("game__cell-fill");
+        cell.firstChild.classList.add("game__cell-fill");
       } else {
-        cell.classList.remove("game__cell-fill");
+        cell.firstChild.classList.remove("game__cell-fill");
       }
     });
   });
@@ -164,9 +170,9 @@ function pickHandler(e) {
   const button = e.button;
   const target = e.target;
   const currentCell = target.dataset.cell;
-  const currentCellParent = target.parentNode.dataset.cells;
+  const currentCellParent = target.parentNode.parentNode.dataset.cells;
   let answer = 0;
-  if (target.classList.contains("game__cell")) {
+  if (target.classList.contains("game__cell-inner")) {
     startGame();
     activatedButtons(RESET_GAME_BUTTON);
     if (button === 0) {
@@ -186,9 +192,11 @@ function pickHandler(e) {
     }
 
     if (button === 2) {
-      if (target.classList.contains("game__cell-fill")) {
+      if (target.classList.contains("game__cell-fill") &&
+      !target.classList.contains("game__cell-cross")) {
         target.classList.remove("game__cell-fill");
         answer = 0;
+        target.classList.add("game__cell-cross");
         deleteMatrixElement(currentCellParent, currentCell);
       }
       if (
@@ -196,6 +204,7 @@ function pickHandler(e) {
         target.classList.contains("game__cell-cross")
       ) {
         SOUND_EMPTY.play();
+        target.classList.remove("game__cell-cross");
       }
 
       if (
@@ -203,8 +212,8 @@ function pickHandler(e) {
         !target.classList.contains("game__cell-cross")
       ) {
         SOUND_CROSS.play();
+        target.classList.add("game__cell-cross");
       }
-      target.classList.toggle("game__cell-cross");
     }
   }
 }
@@ -220,19 +229,19 @@ function startGame() {
 
 function addBodyListener(callbacks) {
   callbacks.forEach((callback) => {
-    BODY.addEventListener("click", callback);
-    BODY.addEventListener("contextmenu", callback);
+    BODY_GAME.addEventListener("click", callback);
+    BODY_GAME.addEventListener("contextmenu", callback);
   });
 }
 
 function removeBodyListener(callbacks, contextmenu = false) {
   callbacks.forEach((callback) => {
-    BODY.removeEventListener("click", callback);
-    BODY.removeEventListener("contextmenu", callback);
+    BODY_GAME.removeEventListener("click", callback);
+    BODY_GAME.removeEventListener("contextmenu", callback);
   });
 
   if (contextmenu) {
-    BODY.addEventListener("contextmenu", (e) => {
+    BODY_GAME.addEventListener("contextmenu", (e) => {
       e.preventDefault();
     });
   }
@@ -255,24 +264,26 @@ function activatedButtons(buttons) {
 }
 
 function saveGame() {
-  const save = {
+  SAVE_CURRENT_GAME = {
     "currentTimer": TIMER.current(),
     "matrix": MATRIX,
     "nonogramName": NONOGRAM_NAME,
     "nonogramSize": NONOGRAM_SIZE,
+    "gameTime": new Date(),
   };
+  activatedButtons(CONTINUE_GAME_BUTTON);
 
-  sessionStorage.setItem("save", JSON.stringify(save));
+  localStorage.setItem("SAVE_CURRENT_GAME", JSON.stringify(SAVE_CURRENT_GAME));
 }
 
 function continueGame(gameSelectContainer) {
-  const save = JSON.parse(sessionStorage.getItem("save"));
-  MATRIX = save["matrix"];
+  LOAD_CURRENT_GAME = JSON.parse(localStorage.getItem("SAVE_CURRENT_GAME"));
+  MATRIX = LOAD_CURRENT_GAME["matrix"];
   TIMER.stop();
-  TIMER = new Timer(MINUTES, SECONDS, ...save["currentTimer"]);
+  TIMER = new Timer(MINUTES, SECONDS, ...LOAD_CURRENT_GAME["currentTimer"]);
   TIMER.update();
-  NONOGRAM_NAME = save["nonogramName"];
-  NONOGRAM_SIZE = save["nonogramSize"];
+  NONOGRAM_NAME = LOAD_CURRENT_GAME["nonogramName"];
+  NONOGRAM_SIZE = LOAD_CURRENT_GAME["nonogramSize"];
   renderGame(NONOGRAM_SIZE, NONOGRAM_NAME, false);
 
   fillCells(false);
@@ -288,7 +299,7 @@ function continueGame(gameSelectContainer) {
   );
 }
 
-function randomGame(gameSelectContainer, gameLevels, gameStages) {
+function randomGame(gameSelectContainer, gameLevels) {
   if (TIMER_RUN) {
     TIMER.stop();
     TIMER_RUN = false;
@@ -299,8 +310,8 @@ function randomGame(gameSelectContainer, gameLevels, gameStages) {
   const randomSize = Math.floor(Math.random() * arrMain.length);
   const arrSecond = Object.keys(TEMPLATE[Number(arrMain[randomSize])]);
   const randomName = Math.floor(Math.random() * arrSecond.length);
-  const sessionSize = Number(sessionStorage.getItem("NONOGRAM_SIZE"));
-  const sessionName = sessionStorage.getItem("NONOGRAM_NAME");
+  const sessionSize = Number(localStorage.getItem("NONOGRAM_SIZE"));
+  const sessionName = localStorage.getItem("NONOGRAM_NAME");
   arrMain[randomSize] = Number(arrMain[randomSize]);
   NONOGRAM_SIZE = arrMain[randomSize];
   NONOGRAM_NAME = arrSecond[randomName];
@@ -322,10 +333,10 @@ function randomGame(gameSelectContainer, gameLevels, gameStages) {
     sessionSize === arrMain[randomSize] &&
     sessionName === arrSecond[randomName]
   ) {
-    return randomGame();
+    return randomGame(gameSelectContainer, gameLevels);
   } else {
-    sessionStorage.setItem("NONOGRAM_SIZE", arrMain[randomSize]);
-    sessionStorage.setItem("NONOGRAM_NAME", arrSecond[randomName]);
+    localStorage.setItem("NONOGRAM_SIZE", arrMain[randomSize]);
+    localStorage.setItem("NONOGRAM_NAME", arrSecond[randomName]);
     currentLevelSelect.textContent = DIFFICULTY[arrMain[randomSize]];
     renderGame(arrMain[randomSize], arrSecond[randomName]);
     Array.from(gameSelectContainer.children).forEach((el) => {
@@ -340,11 +351,13 @@ function randomGame(gameSelectContainer, gameLevels, gameStages) {
 }
 
 function resetGame() {
-  Array.from(GAME_WRAP.querySelectorAll(".game__cell")).forEach((cell) => {
-    cell.classList.remove("game__cell-fill");
-    cell.classList.remove("game__cell-cross");
-    cell.classList.remove("game__cell-unuse");
-  });
+  Array.from(GAME_WRAP.querySelectorAll(".game__cell-inner")).forEach(
+    (cell) => {
+      cell.classList.remove("game__cell-fill");
+      cell.classList.remove("game__cell-cross");
+      cell.classList.remove("game__cell-unuse");
+    }
+  );
   addBodyListener([pickHandler, startGame]);
   MATRIX = createMatrix(NONOGRAM_SIZE);
   return;
@@ -371,8 +384,8 @@ function createContainer(containerClass = "", need) {
   return container;
 }
 
-function getGamePlace(nonogramSize, nonogramName) {
-  const pic = TEMPLATE[nonogramSize][nonogramName];
+function getGamePlace() {
+  const pic = TEMPLATE[NONOGRAM_SIZE][NONOGRAM_NAME];
   const rows = [];
   const cols = [];
 
@@ -416,28 +429,31 @@ function getGamePlace(nonogramSize, nonogramName) {
 }
 
 function createCluesList(clues, cluesClass) {
-  const ul = document.createElement("ul");
-  ul.className = `game__clues clues__${cluesClass}`;
+  const div = document.createElement("div");
+  div.className = `game__clues clues__${cluesClass}`;
 
-  clues.forEach((clue) => {
-    const li = document.createElement("li");
-    li.className = `clues__${cluesClass}-item`;
+  clues.forEach((clue, i) => {
+    const divSecond = document.createElement("div");
+    divSecond.className = `clues__${cluesClass}-item`;
+    if ((i + 1) % 5 === 0) {
+      divSecond.classList.add(`clues__${cluesClass}-item-border`);
+    }
     if (clue.length === 0) {
       const p = document.createElement("p");
       p.className = `clues__${cluesClass}-num`;
       p.innerHTML = "&nbsp;";
-      li.append(p);
+      divSecond.append(p);
     }
     clue.forEach((n) => {
       const p = document.createElement("p");
       p.className = `clues__${cluesClass}-num`;
       p.textContent = n;
-      li.append(p);
+      divSecond.append(p);
     });
-    ul.append(li);
+    div.append(divSecond);
   });
 
-  return ul;
+  return div;
 }
 
 function createMatrix(num) {
@@ -600,7 +616,7 @@ function getTimer() {
   return { MINUTES, SECONDS };
 }
 
-function createPlace(nonogramSize, nonogramName) {
+function createPlace() {
   const place = document.createElement("div");
   place.className = "game__place";
 
@@ -608,10 +624,10 @@ function createPlace(nonogramSize, nonogramName) {
   top.className = "game__top clues";
   const left = document.createElement("div");
   left.className = "game__left clues";
-  BODY = document.createElement("div");
-  BODY.className = "game__body";
+  BODY_GAME = document.createElement("div");
+  BODY_GAME.className = "game__body";
 
-  const { pic, rows, cols } = getGamePlace(nonogramSize, nonogramName);
+  const { pic, rows, cols } = getGamePlace();
   const topClues = createCluesList(cols, "top");
   const leftClues = createCluesList(rows, "left");
 
@@ -624,22 +640,24 @@ function createPlace(nonogramSize, nonogramName) {
     }
     p.forEach((_, j) => {
       const cell = document.createElement("div");
+      const cellInner = document.createElement("div");
       cell.className = "game__cell";
-      cell.dataset.cell = j;
+      cellInner.className = "game__cell-inner";
+      cellInner.dataset.cell = j;
       if ((j + 1) % 5 === 0) {
         cell.classList.add("game__cell-border");
       }
-
+      cell.append(cellInner);
       div.append(cell);
     });
-    BODY.append(div);
+    BODY_GAME.append(div);
   });
 
   addBodyListener([pickHandler, startGame]);
 
   top.append(topClues);
   left.append(leftClues);
-  place.append(top, left, BODY);
+  place.append(top, left, BODY_GAME);
   return place;
 }
 
@@ -705,6 +723,10 @@ function createMainContent() {
   const gameStages = createSelectStages();
 
   disabledButtons([SAVE_BUTTON, RESET_GAME_BUTTON]);
+
+  if (!LOAD_CURRENT_GAME) {
+    disabledButtons(CONTINUE_GAME_BUTTON);
+  }
 
   SAVE_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();

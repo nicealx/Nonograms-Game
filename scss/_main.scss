@@ -62,26 +62,39 @@ p {
 
   &__body {
     grid-area: body;
-    border: 2px solid $color-border;
   }
 
   &__cells {
     display: flex;
+    border-left: 2px solid $color-border;
+    border-right: 2px solid $color-border;
+
+    &:first-child {
+      border-top: 2px solid $color-border;
+    }
 
     &-border {
-      border-bottom: 1px solid $color-border;
+      .game__cell {
+        border-bottom: 2px solid $color-border;
+      }
+
+      &:last-child {
+        border-bottom: 2px solid $color-border;
+      }
     }
   }
 
   &__cell {
-    cursor: pointer;
     position: relative;
-    flex: 1 1 100%;
     border: 0.5px solid $color-border;
     background-color: $bcg-light;
-    width: 20px;
-    height: 20px;
     transition: background-color 0.3s;
+    
+    &-inner {
+      cursor: pointer;
+      width: $size-cell;
+      height: $size-cell;
+    }
 
     &-unuse {
       cursor: inherit;
@@ -92,7 +105,17 @@ p {
     }
 
     &-fill {
-      background-color: $bgc-dark;
+      position: relative;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 95%;
+        height: 95%;
+        background-color: $bgc-dark;
+        transform: translate(-50%, -50%);
+      }
     }
 
     &-cross {
@@ -193,6 +216,7 @@ p {
       cursor: inherit;
       user-select: none;
       background-color: lighten($bgc-dark, $amount: 80);
+
       &:hover {
         background-color: lighten($bgc-dark, $amount: 80);
       }
@@ -204,18 +228,27 @@ p {
   &__top {
     display: flex;
     flex-direction: row;
+    border-top: 2px solid $color-border;
+    border-left: 2px solid $color-border;
+    border-right: 2px solid $color-border;
 
     &-item {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
+      border: 0.5px solid $color-border;
+
+
+      &-border {
+        border-right: 2px solid $color-border;
+      }
     }
 
     &-num {
-      width: 20.5px;
-      height: 20.5px;
       text-align: center;
+      width: $size-cell;
+      height: $size-cell;
     }
   }
 
@@ -224,20 +257,26 @@ p {
     flex-direction: column;
     align-items: end;
     justify-content: center;
-    height: 100%;
+    border-top: 2px solid $color-border;
+    border-left: 2px solid $color-border;
+    border-bottom: 2px solid $color-border;
 
     &-item {
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: center;
+      border: 0.5px solid $color-border;
+
+      &-border {
+        border-bottom: 2px solid $color-border;
+      }
     }
 
     &-num {
-      width: 20.5px;
-      height: 20.5px;
       text-align: center;
-
+      width: $size-cell;
+      height: $size-cell;
     }
   }
 }
@@ -276,7 +315,7 @@ p {
     transform: translate(-50%, -50%);
     z-index: 2;
   }
-  
+
   &__container {
     position: relative;
     display: flex;
@@ -312,6 +351,7 @@ p {
     &::before {
       transform: rotate(-45deg);
     }
+
     &::after {
       transform: rotate(45deg);
     }

@@ -92,28 +92,34 @@ p {
 }
 .game__body {
   grid-area: body;
-  border: 2px solid grey;
 }
 .game__cells {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  border-left: 2px solid grey;
+  border-right: 2px solid grey;
 }
-.game__cells-border {
-  border-bottom: 1px solid grey;
+.game__cells:first-child {
+  border-top: 2px solid grey;
+}
+.game__cells-border .game__cell {
+  border-bottom: 2px solid grey;
+}
+.game__cells-border:last-child {
+  border-bottom: 2px solid grey;
 }
 .game__cell {
-  cursor: pointer;
   position: relative;
-  -webkit-box-flex: 1;
-      -ms-flex: 1 1 100%;
-          flex: 1 1 100%;
   border: 0.5px solid grey;
   background-color: #fff;
-  width: 20px;
-  height: 20px;
   -webkit-transition: background-color 0.3s;
   transition: background-color 0.3s;
+}
+.game__cell-inner {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
 }
 .game__cell-unuse {
   cursor: inherit;
@@ -122,7 +128,19 @@ p {
   border-right: 2px solid grey;
 }
 .game__cell-fill {
+  position: relative;
+}
+.game__cell-fill::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 95%;
+  height: 95%;
   background-color: #000;
+  -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
 }
 .game__cell-cross::before, .game__cell-cross::after {
   content: "";
@@ -228,6 +246,9 @@ p {
   -webkit-box-direction: normal;
       -ms-flex-direction: row;
           flex-direction: row;
+  border-top: 2px solid grey;
+  border-left: 2px solid grey;
+  border-right: 2px solid grey;
 }
 .clues__top-item {
   display: -webkit-box;
@@ -243,11 +264,15 @@ p {
   -webkit-box-pack: end;
       -ms-flex-pack: end;
           justify-content: flex-end;
+  border: 0.5px solid grey;
+}
+.clues__top-item-border {
+  border-right: 2px solid grey;
 }
 .clues__top-num {
-  width: 20.5px;
-  height: 20.5px;
   text-align: center;
+  width: 40px;
+  height: 40px;
 }
 .clues__left {
   display: -webkit-box;
@@ -263,7 +288,9 @@ p {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  height: 100%;
+  border-top: 2px solid grey;
+  border-left: 2px solid grey;
+  border-bottom: 2px solid grey;
 }
 .clues__left-item {
   display: -webkit-box;
@@ -279,11 +306,15 @@ p {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
+  border: 0.5px solid grey;
+}
+.clues__left-item-border {
+  border-bottom: 2px solid grey;
 }
 .clues__left-num {
-  width: 20.5px;
-  height: 20.5px;
   text-align: center;
+  width: 40px;
+  height: 40px;
 }
 
 .modal {
