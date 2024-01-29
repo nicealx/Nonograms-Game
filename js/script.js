@@ -424,8 +424,10 @@ function createScoreTable() {
   console.log(SAVE_SCORE_GAME.length )
   if(SAVE_SCORE_GAME.length !== 0) {
     SAVE_SCORE_GAME.sort((a, b) => {
-      return (a["Time"][0] * 60 + a["Time"][1]) - (b["Time"][0] * 60 + b["Time"][1]);
-    }).length = 5;
+      const f = a["Time"][0] * 60 + a["Time"][1];
+      const s = b["Time"][0] * 60 + b["Time"][1]
+      return f - s;
+    });
   
     const table = document.createElement("table");
   

@@ -14,17 +14,17 @@ export default class Timer {
   }
 
   update() {
-    this.minutesElem.textContent = `${this.minutes < 9 ? "0" + this.minutes : this.minutes }:`;
-    this.secondsElem.textContent = `${this.seconds < 9 ? "0" + this.seconds : this.seconds }`;
+    this.minutesElem.textContent = `${this.minutes < 10 ? "0" + this.minutes : this.minutes }:`;
+    this.secondsElem.textContent = `${this.seconds < 10 ? "0" + this.seconds : this.seconds }`;
   }
 
   start() {
-    if (this.minutes < 9) {
+    if (this.minutes < 10) {
       this.minutesElem.textContent = `0${this.minutes}:`;
     } else {
       this.minutesElem.textContent = `${this.minutes}:`;
     }
-    if (this.seconds < 9) {
+    if (this.seconds < 10) {
       this.secondsElem.textContent = `0${this.seconds}`;
     } else {
       this.secondsElem.textContent = this.seconds;
@@ -38,7 +38,7 @@ export default class Timer {
 
   count() {
     this.seconds++;
-    if (this.seconds < 9) {
+    if (this.seconds < 10) {
       this.secondsElem.textContent = `0${this.seconds}`;
     }
 
@@ -52,7 +52,7 @@ export default class Timer {
       this.secondsElem.textContent = `0${this.seconds}`;
     }
 
-    if (this.minutes < 9) {
+    if (this.minutes < 10) {
       this.minutesElem.textContent = `0${this.minutes}:`;
     }
     if (this.minutes > 9) {
