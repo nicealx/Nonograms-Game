@@ -1,8 +1,9 @@
 import Timer from "./timer.js";
 import Button from "./button.js";
 import Modal from "./modal.js";
+import Theme from "./theme.js";
 
-const DOC = document.querySelector(".body");
+const BODY = document.querySelector(".body");
 const GAME_CONTAINER = createContainer("game", true);
 const GAME_WRAP = document.createElement("div");
 const { MINUTES, SECONDS } = getTimer();
@@ -12,12 +13,15 @@ const SOLUTION_BUTTON = new Button("Solution", "game").create();
 const CONTINUE_GAME_BUTTON = new Button("Continue last game", "game").create();
 const RESET_GAME_BUTTON = new Button("Reset game", "game").create();
 const MODAL_WIN = new Modal("modal-win");
-const MODAL_SCORE = new Modal("modal-score");
+const MODAL_SCORE = new Modal("modal-scores");
 const SOUND_CROSS = new Audio("./audio/cross.mp3");
 const SOUND_EMPTY = new Audio("./audio/empty.mp3");
 const SOUND_FILL = new Audio("./audio/fill.mp3");
 const SOUND_WON = new Audio("./audio/won.mp3");
+const THEME_ICONS = new Theme(30, 30);
 const DIFFICULTY = { 5: "Easy", 10: "Medium", 15: "Hard" };
+const GET_THEME = localStorage.getItem("CURRENT_THEME");
+
 const TEMPLATE = {
   5: {
     "Goblet": [
@@ -215,8 +219,9 @@ let TIMER = new Timer(MINUTES, SECONDS, 0, 0, 0);
 let TIMER_RUN = false;
 let SAVE_CURRENT_GAME;
 let LOAD_CURRENT_GAME = JSON.parse(localStorage.getItem("SAVE_CURRENT_GAME"));
-let LOAD_SCORE_GAME = JSON.parse(localStorage.getItem("SAVE_SCORE_GAME"));
-let SAVE_SCORE_GAME = LOAD_SCORE_GAME ? LOAD_SCORE_GAME : [];
+let LOAD_SCORE_GAME = JSON.parse(localStorage.getItem("SAVE_SCORES_GAME"));
+let SAVE_SCORES_GAME = LOAD_SCORE_GAME ? LOAD_SCORE_GAME : [];
+let CURRENT_THEME = GET_THEME ? GET_THEME : "light";
 
 localStorage.setItem("NONOGRAM_SIZE", 0);
 localStorage.setItem("NONOGRAM_NAME", "cup");
@@ -230,7 +235,7 @@ class Link {
 
   create() {
     const li = document.createElement("li");
-    li.className = `${this.classWhere}__item`;
+    li.className = `${this.classWhere}__item ${this.classWhere}__item-${this.name}`;
     const a = document.createElement("a");
     a.className = `${this.classWhere}__link`;
     a.href = this.link;
@@ -365,6 +370,22 @@ function pickHandler(e) {
   }
 }
 
+function themeHandler(e) {  
+  e.preventDefault();
+  CURRENT_THEME = localStorage.getItem("CURRENT_THEME");
+
+  if (CURRENT_THEME === "light") {
+    BODY.classList.add("theme-dark");
+    localStorage.setItem("CURRENT_THEME", "dark");
+    THEME_ICONS.change("dark");
+  }
+  if (CURRENT_THEME === "dark") {
+    BODY.classList.remove("theme-dark");
+    localStorage.setItem("CURRENT_THEME", "light");
+    THEME_ICONS.change("light");
+  }
+}
+
 function startGame() {
   if (!TIMER_RUN) {
     TIMER.start();
@@ -411,58 +432,68 @@ function activatedButtons(buttons) {
 }
 
 function saveScore() {
-  SAVE_SCORE_GAME.push({
-    "Name": NONOGRAM_NAME,
-    "Difficulty": DIFFICULTY[NONOGRAM_SIZE],
-    "Time": TIMER.current(),
+  SAVE_SCORES_GAME.push({
+    "name": NONOGRAM_NAME,
+    "difficulty": DIFFICULTY[NONOGRAM_SIZE],
+    "time": TIMER.current(),
   });
 
-  localStorage.setItem("SAVE_SCORE_GAME", JSON.stringify(SAVE_SCORE_GAME));
+  localStorage.setItem("SAVE_SCORES_GAME", JSON.stringify(SAVE_SCORES_GAME));
 }
 
-function createScoreTable() {
-  console.log(SAVE_SCORE_GAME.length )
-  if(SAVE_SCORE_GAME.length !== 0) {
-    SAVE_SCORE_GAME.sort((a, b) => {
+function createScoresTable() {
+  if (SAVE_SCORES_GAME.length !== 0) {
+    SAVE_SCORES_GAME.sort((a, b) => {
       const f = a["Time"][0] * 60 + a["Time"][1];
-      const s = b["Time"][0] * 60 + b["Time"][1]
+      const s = b["Time"][0] * 60 + b["Time"][1];
       return f - s;
     });
-  
+
+    if (SAVE_SCORES_GAME.length > 5) {
+      SAVE_SCORES_GAME.splice(5);
+    }
+
     const table = document.createElement("table");
-  
+    table.className = "scores";
+
     for (let i = 0; i < 1; i++) {
       const tr = document.createElement("tr");
+      tr.className = "scores__head";
       let th = document.createElement("th");
+      th.className = "scores__pos";
       th.textContent = "№";
       tr.append(th);
-      for (let j = 0; j < Object.keys(SAVE_SCORE_GAME[i]).length; j++) {
+      for (let j = 0; j < Object.keys(SAVE_SCORES_GAME[i]).length; j++) {
         th = document.createElement("th");
-        th.textContent = Object.keys(SAVE_SCORE_GAME[i])[j];
+        th.className = "scores__name";
+        th.textContent = Object.keys(SAVE_SCORES_GAME[i])[j];
         tr.append(th);
       }
       table.append(tr);
     }
-  
-    SAVE_SCORE_GAME.forEach((save, i) => {
+
+    SAVE_SCORES_GAME.forEach((save, i) => {
       const tr = document.createElement("tr");
+      tr.className = "scores__body";
       let td = document.createElement("td");
+      td.className = "scores__item scores__item-pos";
       td.textContent = i + 1;
       tr.append(td);
       Object.keys(save).forEach((item) => {
         td = document.createElement("td");
+        td.className = `scores__item scores__item-${item}`;
         td.textContent = Array.isArray(save[item])
           ? `${save[item][0]}:${
-              save[item][1] < 9 ? "0" + save[item][1] : save[item][1]
+              save[item][1] < 10 ? "0" + save[item][1] : save[item][1]
             }`
           : save[item];
         tr.append(td);
       });
       table.append(tr);
     });
-    MODAL_SCORE.update("Score", table);
+    MODAL_SCORE.update("Scores", table);
   } else {
-    MODAL_SCORE.update("Score", "Score table is empty.");
+    MODAL_SCORE.update("Scores", "Scores table is empty.");
   }
 }
 
@@ -910,14 +941,23 @@ function createHeaderContent() {
   const menu = document.createElement("ul");
   menu.className = "header__menu menu";
 
-  const scoreLink = new Link("Score", "#", "menu").create();
-  const theme = new Link("Theme", "#", "menu").create();
+  const scoreLink = new Link("scores", "#", "menu").create();
+
+  if (CURRENT_THEME === "light") {
+    BODY.classList.remove("theme-dark");
+  } else {
+    BODY.classList.add("theme-dark");
+  }
 
   scoreLink.addEventListener("click", (e) => {
     e.preventDefault();
-    createScoreTable();
+    createScoresTable();
     MODAL_SCORE.show();
   });
+
+  const theme = THEME_ICONS.init();
+  THEME_ICONS.change(CURRENT_THEME);
+  theme.addEventListener("click", themeHandler);
 
   menu.append(scoreLink, theme);
 
@@ -1026,7 +1066,6 @@ function createFooterContent() {
 
   return footer;
 }
-
-DOC.prepend(createFooterContent());
-DOC.prepend(createMainContent(), MODAL_WIN.init(), MODAL_SCORE.init());
-DOC.prepend(createHeaderContent());
+BODY.prepend(createFooterContent());
+BODY.prepend(createMainContent(), MODAL_WIN.init(), MODAL_SCORE.init());
+BODY.prepend(createHeaderContent());
