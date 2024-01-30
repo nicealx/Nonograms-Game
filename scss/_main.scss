@@ -2,19 +2,55 @@
   box-sizing: border-box;
 }
 
+:root {
+  --background-color: rgb(255, 255, 255);
+  --text-color: rgb(0, 0, 0);
+  --accent-color: rgb(0, 123, 255);
+  --border-color: rgb(34, 34, 34);
+  --cell-color: rgb(0, 0, 0);
+  --disabled-color: rgb(164, 164, 164);
+  --disabled-shadow: 0 0 3px 5px var(--disabled-color);
+  --active-shadow: 0 0 3px 3px var(--text-color);
+  --cell-shadow: 0 0 2px 0.5px var(--text-color);
+  --cell-size: 20px;
+}
+
 p {
   margin: 0;
   padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+h1, h2 {
+  margin: 10px 0;
 }
 
 .body {
   position: relative;
   display: flex;
   flex-direction: column;
+  gap: 10px;
   min-height: 100vh;
+  font-family: "Miriam Libre", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  transition: background-color 0.3s;
 
   &.theme-dark {
-    background-color: $bgc-dark
+    --background-color: rgb(34, 34, 34);
+    --text-color: rgb(255, 255, 255);
+    --accent-color: rgb(0, 167, 255);
+    --border-color: rgb(184, 184, 184);
+    --cell-color: rgb(255, 255, 255);
+    --active-shadow: 0 0 3px 3px var(--text-color);
+    --cell-shadow: 0 0 2px 0.5px var(--text-color);
   }
 }
 
@@ -24,12 +60,23 @@ p {
   padding: 0 40px;
 }
 
+.header {
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+  }
+}
+
 .menu {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 20px;
 
   &__link {
+    font-size: 0.8em;
     text-transform: capitalize;
   }
 }
@@ -46,7 +93,12 @@ p {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
   flex: 1 1 100%;
+
+  &__title {
+    text-align: center;
+  }
 
   &__select {
     display: flex;
@@ -55,7 +107,6 @@ p {
 
   &__place {
     display: inline-grid;
-    background-color: beige;
     grid-template-areas:
       "empty top"
       "left body";
@@ -75,34 +126,34 @@ p {
 
   &__cells {
     display: flex;
-    border-left: 2px solid $color-border;
-    border-right: 2px solid $color-border;
+    border-left: 2px solid var(--border-color);
+    border-right: 2px solid var(--border-color);
 
     &:first-child {
-      border-top: 2px solid $color-border;
+      border-top: 2px solid var(--border-color);
     }
 
     &-border {
       .game__cell {
-        border-bottom: 2px solid $color-border;
+        border-bottom: 2px solid var(--border-color);
       }
 
       &:last-child {
-        border-bottom: 2px solid $color-border;
+        border-bottom: 2px solid var(--border-color);
       }
     }
   }
 
   &__cell {
     position: relative;
-    border: 0.5px solid $color-border;
-    background-color: $bcg-light;
+    border: 0.5px solid var(--border-color);
+    background-color: var(--background-color);
     transition: background-color 0.3s;
-    
+
     &-inner {
       cursor: pointer;
-      width: $size-cell;
-      height: $size-cell;
+      width: var(--cell-size);
+      height: var(--cell-size);
     }
 
     &-unuse {
@@ -110,11 +161,12 @@ p {
     }
 
     &-border {
-      border-right: 2px solid $color-border;
+      border-right: 2px solid var(--border-color);
     }
 
     &-fill {
       position: relative;
+
       &::before {
         content: "";
         position: absolute;
@@ -122,9 +174,10 @@ p {
         left: 50%;
         width: 80%;
         height: 80%;
-        background-color: $bgc-dark;
+        background-color: var(--cell-color);
         transform: translate(-50%, -50%);
         border-radius: 2px;
+        box-shadow: var(--cell-shadow);
       }
     }
 
@@ -138,7 +191,7 @@ p {
         left: 50%;
         width: 100%;
         height: 2px;
-        background-color: $bgc-dark;
+        background-color: var(--cell-color);
         border-radius: 2px;
       }
 
@@ -151,18 +204,50 @@ p {
       }
     }
   }
+
+  &__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  &__button {
+    padding: 10px 20px;
+    font-size: 0.7em;
+    font-weight: 600;
+    background-color: var(--text-color);
+    color: var(--background-color);
+    border: none;
+    box-shadow: 0 0 3px 5px var(--text-color);
+    transition: background-color 0.3s, box-shadow 0.3s;
+
+    &:disabled {
+      background-color: var(--disabled-color);
+      color: var(--text-color);
+      box-shadow: var(--disabled-shadow);
+
+      &:active {
+        box-shadow: var(--disabled-shadow);
+      }
+    }
+
+    &:active {
+      box-shadow: var(--active-shadow);
+    }
+  }
 }
 
 .select {
   position: relative;
-  background-color: $bcg-light;
+  background-color: var(--background-color);
   width: 150px;
   z-index: 99;
 
   &__header {
     cursor: pointer;
     display: flex;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
   }
 
   &__current {
@@ -177,25 +262,12 @@ p {
     right: 0;
     top: 100%;
     max-height: 300px;
-    overflow-y: scroll;
-    background-color: $bcg-light;
-    border: 1px solid #cccccc;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
     border-top: 0;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
-
-    &::-webkit-scrollbar {
-      width: 10px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background-color: $bcg-light;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: $bgc-dark;
-    }
 
     &--show {
       opacity: 1;
@@ -211,47 +283,59 @@ p {
     transition: background-color 0.3s;
 
     &:hover {
-      background-color: lighten($bgc-dark, $amount: 90);
+      background-color: var(--text-color);
+      color: var(--background-color)
     }
 
     &--inactive {
       cursor: inherit;
-      background-color: lighten($bgc-dark, $amount: 70);
+      background-color: var(--text-color);
 
       &:hover {
-        background-color: lighten($bgc-dark, $amount: 70);
+        background-color: var(--text-color);
       }
     }
 
     &-current {
       cursor: inherit;
       user-select: none;
-      background-color: lighten($bgc-dark, $amount: 80);
+      background-color: var(--text-color);
+      color: var(--background-color);
 
       &:hover {
-        background-color: lighten($bgc-dark, $amount: 80);
+        background-color: var(--text-color);
       }
     }
   }
 }
 
+.timer {
+  font-family: "Orbitron", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 1em;
+}
+
 .clues {
+  font-size: 0.7em;
+
   &__top {
     display: flex;
     flex-direction: row;
-    border-top: 2px solid $color-border;
-    border-left: 2px solid $color-border;
-    border-right: 2px solid $color-border;
+    border-top: 2px solid var(--border-color);
+    border-left: 2px solid var(--border-color);
+    border-right: 2px solid var(--border-color);
 
     &-item {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      border: 0.5px solid $color-border;
+      border: 0.5px solid var(--border-color);
 
       &-border {
-        border-right: 2px solid $color-border;
+        border-right: 2px solid var(--border-color);
       }
     }
 
@@ -259,8 +343,8 @@ p {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: $size-cell;
-      height: $size-cell;
+      width: var(--cell-size);
+      height: var(--cell-size);
     }
   }
 
@@ -268,19 +352,19 @@ p {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-top: 2px solid $color-border;
-    border-left: 2px solid $color-border;
-    border-bottom: 2px solid $color-border;
+    border-top: 2px solid var(--border-color);
+    border-left: 2px solid var(--border-color);
+    border-bottom: 2px solid var(--border-color);
 
     &-item {
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: flex-end;
-      border: 0.5px solid $color-border;
+      border: 0.5px solid var(--border-color);
 
       &-border {
-        border-bottom: 2px solid $color-border;
+        border-bottom: 2px solid var(--border-color);
       }
     }
 
@@ -288,8 +372,8 @@ p {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: $size-cell;
-      height: $size-cell;
+      width: var(--cell-size);
+      height: var(--cell-size);
     }
   }
 }
@@ -314,7 +398,7 @@ p {
     position: relative;
     width: 100%;
     height: 100%;
-    background-color: lighten($bgc-dark, $amount: 50);
+    background-color: var(--text-color);
     opacity: 0.5;
     z-index: 1;
   }
@@ -338,7 +422,7 @@ p {
     padding: 40px;
     margin: 0 20px;
     border-radius: 5px;
-    background-color: $bcg-light;
+    background-color: var(--background-color);
   }
 
   &__close {
@@ -358,7 +442,7 @@ p {
       right: 0;
       width: 100%;
       height: 2px;
-      background-color: $bgc-dark;
+      background-color: var(--text-color);
     }
 
     &::before {
@@ -373,18 +457,73 @@ p {
   &__title {
     text-align: center;
   }
+
+  &__text {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  &__time {
+    text-align: center;
+  }
 }
 
 .scores {
+  font-size: 0.9em;
+  border: 2px solid var(--border-color);
+  border-collapse: collapse;
+  &__head {
+    border: 2px solid var(--border-color);
+  }
+
+  &__row {
+    
+    &:nth-child(odd) {
+      background-color: var(--disabled-color);
+      .score__item {
+        border: none;
+      }
+    }
+  }
+
+  &__item {
+    padding: 5px 10px;
+  }
   &__name {
     text-transform: capitalize;
+    padding: 5px 10px;
   }
 }
 
 .theme {
+  &__list {
+    position: relative;
+    width: 30px;
+    height: 30px;
+  }
+
+  &__item {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+
   &__hide {
-    display: none;
     opacity: 0;
     visibility: hidden;
+  }
+}
+
+.footer {
+  &__content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+
   }
 }

@@ -444,8 +444,8 @@ function saveScore() {
 function createScoresTable() {
   if (SAVE_SCORES_GAME.length !== 0) {
     SAVE_SCORES_GAME.sort((a, b) => {
-      const f = a["Time"][0] * 60 + a["Time"][1];
-      const s = b["Time"][0] * 60 + b["Time"][1];
+      const f = a["time"][0] * 60 + a["time"][1];
+      const s = b["time"][0] * 60 + b["time"][1];
       return f - s;
     });
 
@@ -460,7 +460,7 @@ function createScoresTable() {
       const tr = document.createElement("tr");
       tr.className = "scores__head";
       let th = document.createElement("th");
-      th.className = "scores__pos";
+      th.className = "scores__name scores__pos";
       th.textContent = "№";
       tr.append(th);
       for (let j = 0; j < Object.keys(SAVE_SCORES_GAME[i]).length; j++) {
@@ -474,7 +474,7 @@ function createScoresTable() {
 
     SAVE_SCORES_GAME.forEach((save, i) => {
       const tr = document.createElement("tr");
-      tr.className = "scores__body";
+      tr.className = "scores__row";
       let td = document.createElement("td");
       td.className = "scores__item scores__item-pos";
       td.textContent = i + 1;
