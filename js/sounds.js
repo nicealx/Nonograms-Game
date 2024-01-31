@@ -20,6 +20,15 @@ export default class Sounds {
     this.soundsLabel.setAttribute("for", `${this.soundsClass}__input`);
 
     this.soundsLi.append(this.soundsLabel, this.soundsInput);
+
+    if (state === "on") {
+      this.soundsOn();
+      this.soundsInput.checked = false;
+    } else {
+      this.soundsOff();
+      this.soundsInput.checked = true;
+    }
+
     this.event();
     return this.soundsLi;
   }

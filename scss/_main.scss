@@ -250,11 +250,7 @@ h2 {
   }
 
   &__buttons {
-    display: grid;
-    // grid-template-areas: "save" "any";
-    grid-template-columns: auto auto;
-    grid-template-rows: auto auto;
-    grid-auto-flow: column;
+    display: flex;
     justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
@@ -270,14 +266,6 @@ h2 {
     border: none;
     box-shadow: 0 0 3px 5px var(--text-color);
     transition: background-color 0.3s, box-shadow 0.3s;
-
-    // &:nth-child(-n + 2) {
-    //   grid-area: save;
-    // }
-
-    // &:nth-child(n + 3) {
-    //   grid-area: any;
-    // }
 
     &:disabled {
       cursor: inherit;
