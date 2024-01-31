@@ -222,6 +222,8 @@ let LOAD_CURRENT_GAME = JSON.parse(localStorage.getItem("SAVE_CURRENT_GAME"));
 let LOAD_SCORE_GAME = JSON.parse(localStorage.getItem("SAVE_SCORES_GAME"));
 let SAVE_SCORES_GAME = LOAD_SCORE_GAME ? LOAD_SCORE_GAME : [];
 let CURRENT_THEME = GET_THEME ? GET_THEME : "light";
+let TOUCH_START = -1;
+let TOUCH_END = 0;
 
 localStorage.setItem("NONOGRAM_SIZE", 0);
 localStorage.setItem("NONOGRAM_NAME", "cup");
@@ -328,10 +330,22 @@ function pickHandler(e) {
   const currentCell = target.dataset.cell;
   const currentCellParent = target.parentNode.parentNode.dataset.cells;
   let answer = 0;
+  const targetTouchStart = e.type === "touchstart";
+  const targetTouchEnd = e.type === "touchend";
+
   if (target.classList.contains("game__cell-inner")) {
+    if (targetTouchStart) {
+      TOUCH_START = new Date(e.timeStamp).getSeconds();
+    }
+
+    if (targetTouchEnd) {
+      TOUCH_END = new Date(e.timeStamp).getSeconds();
+    }
+
+    let timeTap = TOUCH_END - TOUCH_START;
     startGame();
     activatedButtons(RESET_GAME_BUTTON);
-    if (button === 0) {
+    if (button === 0 || (targetTouchEnd && timeTap < 1)) {
       if (target.classList.contains("game__cell-cross")) {
         target.classList.remove("game__cell-cross");
       }
@@ -345,9 +359,11 @@ function pickHandler(e) {
         answer = 1;
         return addMatrixElement(currentCellParent, currentCell, answer);
       }
+      TOUCH_START = -1;
+      TOUCH_END = 0;
     }
 
-    if (button === 2) {
+    if (button === 2 || (targetTouchEnd && timeTap > 1)) {
       if (target.classList.contains("game__cell-fill")) {
         target.classList.remove("game__cell-fill");
         target.classList.add("game__cell-cross");
@@ -366,11 +382,13 @@ function pickHandler(e) {
         answer = 2;
         return addMatrixElement(currentCellParent, currentCell, answer);
       }
+      TOUCH_START = -1;
+      TOUCH_END = 0;
     }
   }
 }
 
-function themeHandler(e) {  
+function themeHandler(e) {
   e.preventDefault();
   CURRENT_THEME = localStorage.getItem("CURRENT_THEME");
 
@@ -399,6 +417,8 @@ function addBodyListener(callbacks) {
   callbacks.forEach((callback) => {
     BODY_GAME.addEventListener("click", callback);
     BODY_GAME.addEventListener("contextmenu", callback);
+    BODY_GAME.addEventListener("touchstart", callback);
+    BODY_GAME.addEventListener("touchend", callback);
   });
 }
 
@@ -406,6 +426,8 @@ function removeBodyListener(callbacks, contextmenu = false) {
   callbacks.forEach((callback) => {
     BODY_GAME.removeEventListener("click", callback);
     BODY_GAME.removeEventListener("contextmenu", callback);
+    BODY_GAME.removeEventListener("touchstart", callback);
+    BODY_GAME.removeEventListener("touchend", callback);
   });
 
   if (contextmenu) {
@@ -1017,10 +1039,10 @@ function createMainContent() {
     resetGame();
   });
 
+  gameSelectContainer.append(gameLevels, gameStages);
   gameTimerBlock.append(MINUTES, SECONDS);
   gameTimer.append(gameTimerBlock);
   GAME_WRAP.append(gameContent);
-  gameSelectContainer.append(gameLevels, gameStages);
   gameButtonsContainer.append(
     SAVE_BUTTON,
     CONTINUE_GAME_BUTTON,
@@ -1058,7 +1080,7 @@ function createFooterContent() {
 
   const p = document.createElement("p");
   p.className = "footer__text";
-  p.textContent = "Nonograms Game 2024";
+  p.textContent = "Nonogram Games 2024";
 
   content.append(p);
   container.append(content);

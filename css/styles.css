@@ -4,11 +4,6 @@ ul, li {
   margin: 0;
 }
 
-* {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-}
-
 :root {
   --background-color: rgb(255, 255, 255);
   --text-color: rgb(0, 0, 0);
@@ -19,7 +14,13 @@ ul, li {
   --disabled-shadow: 0 0 3px 5px var(--disabled-color);
   --active-shadow: 0 0 3px 3px var(--text-color);
   --cell-shadow: 0 0 2px 0.5px var(--text-color);
-  --cell-size: 20px;
+  --cell-size: 30px;
+  --main-font-size: 24px;
+}
+
+* {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 p {
@@ -48,9 +49,9 @@ h1, h2 {
   gap: 10px;
   min-height: 100vh;
   font-family: "Miriam Libre", sans-serif;
-  font-weight: 400;
+  font-weight: 600;
   font-style: normal;
-  font-size: 24px;
+  font-size: var(--main-font-size);
   color: var(--text-color);
   background-color: var(--background-color);
   -webkit-transition: background-color 0.3s;
@@ -126,16 +127,32 @@ h1, h2 {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 40px;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 1 100%;
+          flex: 1 1 100%;
+}
+.game__wrap {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
   gap: 20px;
-  -webkit-box-flex: 1;
-      -ms-flex: 1 1 100%;
-          flex: 1 1 100%;
 }
 .game__title {
   text-align: center;
@@ -258,9 +275,9 @@ h1, h2 {
 }
 .game__button:disabled {
   background-color: var(--disabled-color);
-  color: var(--text-color);
   -webkit-box-shadow: var(--disabled-shadow);
           box-shadow: var(--disabled-shadow);
+  color: #ffffff;
 }
 .game__button:disabled:active {
   -webkit-box-shadow: var(--disabled-shadow);
@@ -285,7 +302,7 @@ h1, h2 {
   border: 1px solid var(--border-color);
 }
 .select__current {
-  font-size: 18px;
+  font-size: 0.8em;
   line-height: 24px;
   padding: 8px;
 }
@@ -310,7 +327,7 @@ h1, h2 {
 .select__option {
   cursor: pointer;
   padding: 8px;
-  font-size: 16px;
+  font-size: 0.8em;
   line-height: 24px;
   -webkit-transition: background-color 0.3s;
   transition: background-color 0.3s;
@@ -592,11 +609,22 @@ h1, h2 {
           align-items: center;
   height: 60px;
 }
+.footer__text {
+  font-size: 0.8em;
+}
 
-@media (prefers-color-scheme: dark) {
+@media screen and (max-width: 700px) {
   :root {
-    --background-color: #222222;
-    --text-color: #ffffff;
-    --accent-color: #00a7ff;
+    --cell-size: 20px;
+    --main-font-size: 18px;
+  }
+}
+@media screen and (max-width: 500px) {
+  :root {
+    --cell-size: 19px;
+    --main-font-size: 16px;
+  }
+  .container {
+    padding: 0 10px;
   }
 }
