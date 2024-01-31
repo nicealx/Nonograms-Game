@@ -20,6 +20,7 @@ const SOUNDS = new Sounds();
 
 const DIFFICULTY = { 5: "Easy", 10: "Medium", 15: "Hard" };
 const GET_THEME = localStorage.getItem("CURRENT_THEME");
+const SOUNDS_STATE = localStorage.getItem("SOUNDS_STATE");
 
 const TEMPLATE = {
   5: {
@@ -225,7 +226,7 @@ let TOUCH_START = -1;
 let TOUCH_END = 0;
 
 localStorage.setItem("NONOGRAM_SIZE", 0);
-localStorage.setItem("NONOGRAM_NAME", "cup");
+localStorage.setItem("NONOGRAM_NAME", "Goblet");
 
 class Link {
   constructor(name, link, classWhere) {
@@ -981,7 +982,7 @@ function createHeaderContent() {
   THEME_ICONS.change(CURRENT_THEME);
   theme.addEventListener("click", themeHandler);
 
-  const sound = SOUNDS.init();
+  const sound = SOUNDS.init(SOUNDS_STATE);
   
   menu.append(scoreLink, sound, theme);
 

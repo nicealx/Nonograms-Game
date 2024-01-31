@@ -11,12 +11,12 @@ export default class Sounds {
     this.soundsWon = new Audio("./audio/won.mp3");
   }
 
-  init() {
+  init(state) {
     this.soundsLi.className = `menu__item ${this.soundsClass}`;
     this.soundsInput.className = `${this.soundsClass}__input`;
     this.soundsInput.setAttribute("id", `${this.soundsClass}__input`);
     this.soundsInput.type = "checkbox";
-    this.soundsLabel.className = `${this.soundsClass}__label ${this.soundsClass}__on`;
+    this.soundsLabel.className = `${this.soundsClass}__label ${this.soundsClass}__${state}`;
     this.soundsLabel.setAttribute("for", `${this.soundsClass}__input`);
 
     this.soundsLi.append(this.soundsLabel, this.soundsInput);
@@ -28,7 +28,9 @@ export default class Sounds {
     this.soundsInput.addEventListener("change", ({ target }) => {
       if (target.checked) {
         this.soundsOff();
+        localStorage.setItem("SOUNDS_STATE", "off");
       } else {
+        localStorage.setItem("SOUNDS_STATE", "on");
         this.soundsOn();
       }
     });
