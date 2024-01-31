@@ -3,6 +3,12 @@
     --cell-size: 20px;
     --main-font-size: 18px;
   }
+
+  .game {
+    &__button {
+      padding: 5px 10px;
+    }
+  }
 }
 
 @media screen and (max-width: 500px) {

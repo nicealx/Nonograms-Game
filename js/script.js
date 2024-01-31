@@ -1058,9 +1058,9 @@ function createMainContent() {
 
   GAME_CONTAINER.append(
     gameSelectContainer,
+    gameButtonsContainer,
     gameTimer,
     GAME_WRAP,
-    gameButtonsContainer
   );
   main.append(GAME_CONTAINER);
 
