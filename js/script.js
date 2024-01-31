@@ -846,6 +846,7 @@ function createSelectStages(
         TIMER_RUN = false;
       }
       TIMER.reset();
+      disabledButtons(SAVE_BUTTON)
       activatedButtons(SOLUTION_BUTTON);
       renderGame(NONOGRAM_SIZE, NONOGRAM_NAME);
     }
