@@ -2,6 +2,7 @@ import Timer from "./timer.js";
 import Button from "./button.js";
 import Modal from "./modal.js";
 import Theme from "./theme.js";
+import Sounds from "./sounds.js";
 
 const BODY = document.querySelector(".body");
 const GAME_CONTAINER = createContainer("game", true);
@@ -14,11 +15,9 @@ const CONTINUE_GAME_BUTTON = new Button("Continue last game", "game").create();
 const RESET_GAME_BUTTON = new Button("Reset game", "game").create();
 const MODAL_WIN = new Modal("modal-win");
 const MODAL_SCORE = new Modal("modal-scores");
-const SOUND_CROSS = new Audio("./audio/cross.mp3");
-const SOUND_EMPTY = new Audio("./audio/empty.mp3");
-const SOUND_FILL = new Audio("./audio/fill.mp3");
-const SOUND_WON = new Audio("./audio/won.mp3");
 const THEME_ICONS = new Theme(30, 30);
+const SOUNDS = new Sounds();
+
 const DIFFICULTY = { 5: "Easy", 10: "Medium", 15: "Hard" };
 const GET_THEME = localStorage.getItem("CURRENT_THEME");
 
@@ -261,7 +260,7 @@ function checkWin() {
     TIMER.stop();
     TIMER_RUN = false;
     disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
-    SOUND_WON.play();
+    SOUNDS.include("won");
     const time = TIMER.current();
     const timeWin = time[0] * 60 + time[1];
 
@@ -351,11 +350,11 @@ function pickHandler(e) {
       }
       if (target.classList.contains("game__cell-fill")) {
         target.classList.toggle("game__cell-fill");
-        SOUND_EMPTY.play();
+        SOUNDS.include("empty");
         return deleteMatrixElement(currentCellParent, currentCell);
       } else {
         target.classList.toggle("game__cell-fill");
-        SOUND_FILL.play();
+        SOUNDS.include("fill");
         answer = 1;
         return addMatrixElement(currentCellParent, currentCell, answer);
       }
@@ -367,17 +366,17 @@ function pickHandler(e) {
       if (target.classList.contains("game__cell-fill")) {
         target.classList.remove("game__cell-fill");
         target.classList.add("game__cell-cross");
-        SOUND_CROSS.play();
+        SOUNDS.include("cross");
         answer = 2;
         return addMatrixElement(currentCellParent, currentCell, answer);
       }
       if (target.classList.contains("game__cell-cross")) {
-        SOUND_EMPTY.play();
+        SOUNDS.include("empty");
         target.classList.remove("game__cell-cross");
         answer = 0;
         return addMatrixElement(currentCellParent, currentCell, answer);
       } else {
-        SOUND_CROSS.play();
+        SOUNDS.include("cross");
         target.classList.add("game__cell-cross");
         answer = 2;
         return addMatrixElement(currentCellParent, currentCell, answer);
@@ -982,7 +981,9 @@ function createHeaderContent() {
   THEME_ICONS.change(CURRENT_THEME);
   theme.addEventListener("click", themeHandler);
 
-  menu.append(scoreLink, theme);
+  const sound = SOUNDS.init();
+  
+  menu.append(scoreLink, sound, theme);
 
   content.append(logo, menu);
   container.append(content);

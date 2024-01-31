@@ -26,7 +26,8 @@ a {
   color: var(--text-color);
 }
 
-h1, h2 {
+h1,
+h2 {
   margin: 10px 0;
 }
 
@@ -52,6 +53,13 @@ h1, h2 {
     --cell-color: rgb(255, 255, 255);
     --active-shadow: 0 0 3px 3px var(--text-color);
     --cell-shadow: 0 0 2px 0.5px var(--text-color);
+
+    .sounds__on {
+      background: url(../icons/on-white.svg);
+    }
+    .sounds__off {
+      background: url(../icons/off-white.svg);
+    }
   }
 }
 
@@ -76,9 +84,36 @@ h1, h2 {
   justify-content: flex-end;
   gap: 20px;
 
-  &__link {
+  &__item {
     font-size: 0.8em;
+  }
+
+  &__link {
     text-transform: capitalize;
+  }
+}
+
+.sounds {
+  position: relative;
+  
+  &__label {
+    cursor: pointer;
+    display: block;
+    width: 25px;
+    height: 25px;
+    transition: background 0.3s;
+  }
+
+  &__input {
+    position: absolute;
+    appearance: none;
+  }
+
+  &__on {
+    background: url(../icons/on.svg);
+  }
+  &__off {
+    background: url(../icons/off.svg);
   }
 }
 
@@ -222,6 +257,7 @@ h1, h2 {
   }
 
   &__button {
+    cursor: pointer;
     padding: 10px 20px;
     font-size: 0.7em;
     font-weight: 600;
@@ -232,6 +268,8 @@ h1, h2 {
     transition: background-color 0.3s, box-shadow 0.3s;
 
     &:disabled {
+      cursor: inherit;
+      user-select: none;
       background-color: var(--disabled-color);
       box-shadow: var(--disabled-shadow);
       color: #ffffff;
@@ -481,14 +519,16 @@ h1, h2 {
   font-size: 0.9em;
   border: 2px solid var(--border-color);
   border-collapse: collapse;
+
   &__head {
     border: 2px solid var(--border-color);
   }
 
   &__row {
-    
+
     &:nth-child(odd) {
       background-color: var(--disabled-color);
+
       .score__item {
         border: none;
       }
@@ -498,6 +538,7 @@ h1, h2 {
   &__item {
     padding: 5px 10px;
   }
+
   &__name {
     text-transform: capitalize;
     padding: 5px 10px;

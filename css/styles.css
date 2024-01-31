@@ -33,7 +33,8 @@ a {
   color: var(--text-color);
 }
 
-h1, h2 {
+h1,
+h2 {
   margin: 10px 0;
 }
 
@@ -65,6 +66,12 @@ h1, h2 {
   --cell-color: rgb(255, 255, 255);
   --active-shadow: 0 0 3px 3px var(--text-color);
   --cell-shadow: 0 0 2px 0.5px var(--text-color);
+}
+.body.theme-dark .sounds__on {
+  background: url(../icons/on-white.svg);
+}
+.body.theme-dark .sounds__off {
+  background: url(../icons/off-white.svg);
 }
 
 .container {
@@ -98,9 +105,35 @@ h1, h2 {
           justify-content: flex-end;
   gap: 20px;
 }
-.menu__link {
+.menu__item {
   font-size: 0.8em;
+}
+.menu__link {
   text-transform: capitalize;
+}
+
+.sounds {
+  position: relative;
+}
+.sounds__label {
+  cursor: pointer;
+  display: block;
+  width: 25px;
+  height: 25px;
+  -webkit-transition: background 0.3s;
+  transition: background 0.3s;
+}
+.sounds__input {
+  position: absolute;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+.sounds__on {
+  background: url(../icons/on.svg);
+}
+.sounds__off {
+  background: url(../icons/off.svg);
 }
 
 .main {
@@ -260,6 +293,7 @@ h1, h2 {
       flex-wrap: wrap;
 }
 .game__button {
+  cursor: pointer;
   padding: 10px 20px;
   font-size: 0.7em;
   font-weight: 600;
@@ -274,6 +308,11 @@ h1, h2 {
   transition: background-color 0.3s, box-shadow 0.3s, -webkit-box-shadow 0.3s;
 }
 .game__button:disabled {
+  cursor: inherit;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   background-color: var(--disabled-color);
   -webkit-box-shadow: var(--disabled-shadow);
           box-shadow: var(--disabled-shadow);

@@ -37,11 +37,13 @@ export default class Modal {
   }
 
   event() {
-    this.modal.addEventListener("click", () => {
-      this.hide();
-      setTimeout(() => {
-        this.clear();
-      }, 300);
+    this.modal.addEventListener("click", ({target}) => {
+      if(target === this.close || target === this.overlay) {
+        this.hide();
+        setTimeout(() => {
+          this.clear();
+        }, 300);
+      }
     });
   }
 
