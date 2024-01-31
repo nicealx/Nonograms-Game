@@ -20,7 +20,7 @@ const SOUNDS = new Sounds();
 
 const DIFFICULTY = { 5: "Easy", 10: "Medium", 15: "Hard" };
 const GET_THEME = localStorage.getItem("CURRENT_THEME");
-const SOUNDS_STATE = localStorage.getItem("SOUNDS_STATE");
+const SOUNDS_STATE = localStorage.getItem("SOUNDS_STATE") ? localStorage.getItem("SOUNDS_STATE") : "on";
 
 const TEMPLATE = {
   5: {
@@ -227,6 +227,8 @@ let SAVE_SCORES_GAME = LOAD_SCORE_GAME ? LOAD_SCORE_GAME : [];
 let CURRENT_THEME = GET_THEME ? GET_THEME : "light";
 let TOUCH_START = -1;
 let TOUCH_END = 0;
+
+localStorage.setItem("CURRENT_THEME", CURRENT_THEME)
 
 class Link {
   constructor(name, link, classWhere) {
