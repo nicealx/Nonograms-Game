@@ -211,9 +211,12 @@ const TEMPLATE = {
   },
 };
 
+localStorage.setItem("NONOGRAM_SIZE", 5);
+localStorage.setItem("NONOGRAM_NAME", "Goblet");
+
 let MATRIX = [];
-let NONOGRAM_SIZE = 5;
-let NONOGRAM_NAME = "Goblet";
+let NONOGRAM_SIZE = localStorage.getItem("NONOGRAM_SIZE");
+let NONOGRAM_NAME = localStorage.getItem("NONOGRAM_NAME");
 let BODY_GAME;
 let TIMER = new Timer(MINUTES, SECONDS, 0, 0, 0);
 let TIMER_RUN = false;
@@ -224,9 +227,6 @@ let SAVE_SCORES_GAME = LOAD_SCORE_GAME ? LOAD_SCORE_GAME : [];
 let CURRENT_THEME = GET_THEME ? GET_THEME : "light";
 let TOUCH_START = -1;
 let TOUCH_END = 0;
-
-localStorage.setItem("NONOGRAM_SIZE", 0);
-localStorage.setItem("NONOGRAM_NAME", "Goblet");
 
 class Link {
   constructor(name, link, classWhere) {
