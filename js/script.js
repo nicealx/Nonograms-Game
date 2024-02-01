@@ -583,7 +583,8 @@ function randomGame(gameSelectContainer, gameDifficulty) {
   NONOGRAM_NAME = arrSecond[randomName];
 
   const currentLevelSelect = gameDifficulty.children[0].firstChild;
-  const levelsSelectOptions = gameDifficulty.querySelectorAll(".select__option");
+  const levelsSelectOptions =
+    gameDifficulty.querySelectorAll(".select__option");
 
   Array.from(gameSelectContainer.querySelectorAll(".select__option")).forEach(
     (option) => option.classList.remove("select__option-current")
@@ -1067,6 +1068,11 @@ function createMainContent() {
 
   const gameContent = createGameSpace(NONOGRAM_SIZE, NONOGRAM_NAME);
   const gameButtonsContainer = createContainer("game__buttons", false);
+  const gameButtonsSaveLoad = createContainer("game__buttons-save", false);
+  const gameButtonsAdditional = createContainer(
+    "game__buttons-additional",
+    false
+  );
   const gameDifficulty = createSelectDifficulty(gameSelectContainer);
   const gameLevels = createSelectLevels();
 
@@ -1105,13 +1111,14 @@ function createMainContent() {
   gameTimerBlock.append(MINUTES, SECONDS);
   gameTimer.append(gameTimerBlock);
   GAME_WRAP.append(gameContent);
-  gameButtonsContainer.append(
-    SAVE_BUTTON,
-    CONTINUE_GAME_BUTTON,
+  gameButtonsSaveLoad.append(SAVE_BUTTON, CONTINUE_GAME_BUTTON);
+  gameButtonsAdditional.append(
     RANDOM_GAME_BUTTON,
     SOLUTION_BUTTON,
     RESET_GAME_BUTTON
   );
+
+  gameButtonsContainer.append(gameButtonsSaveLoad, gameButtonsAdditional);
 
   GAME_CONTAINER.append(
     gameSelectContainer,

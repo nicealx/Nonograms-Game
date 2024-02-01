@@ -301,12 +301,27 @@ li {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  gap: 20px;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 10px;
   -ms-flex-wrap: wrap;
       flex-wrap: wrap;
+}
+.game__buttons-save, .game__buttons-additional {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  gap: 10px;
 }
 .game__button {
   cursor: pointer;
@@ -720,9 +735,6 @@ li {
   .logo {
     width: 30px;
     height: 30px;
-  }
-  .game__button {
-    padding: 5px 10px;
   }
 }
 @media screen and (max-width: 500px) {
