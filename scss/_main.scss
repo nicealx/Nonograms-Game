@@ -13,27 +13,6 @@
   --main-font-size: 24px;
 }
 
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-
-}
-
-p {
-  margin: 0;
-  padding: 0;
-}
-
-a {
-  text-decoration: none;
-  color: var(--text-color);
-}
-
-h1,
-h2 {
-  margin: 10px 0;
-}
-
 .body {
   position: relative;
   display: flex;
@@ -81,9 +60,22 @@ h2 {
     height: 60px;
     margin: 20px 0;
   }
+}
 
-  &__logo {
-    max-width: 40px;
+.logo {
+  width: 40px;
+  height: 40px;
+
+  rect {
+    stroke: var(--text-color);
+  }
+
+  rect:nth-child(2) {
+    fill: var(--text-color);
+  }
+
+  rect:nth-child(5) {
+    fill: var(--text-color);
   }
 }
 

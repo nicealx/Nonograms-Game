@@ -1,4 +1,26 @@
-ul, li {
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+h1,
+h2 {
+  margin: 10px 0;
+}
+
+ul,
+li {
   list-style: none;
   padding: 0;
   margin: 0;

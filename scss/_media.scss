@@ -6,10 +6,12 @@
 
   .header {
     &__content {
-      margin: 10px 0;
+      margin: 10px 0 40px 0;
     }
+
     &__logo {
-      max-width: 30px;
+      width: 30px;
+      height: 30px;
     }
   }
 
