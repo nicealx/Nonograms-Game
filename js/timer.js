@@ -33,7 +33,6 @@ export default class Timer {
     this.timer = setInterval(() => {
       this.count();
     }, 1000);
-    console.log("Timer started");
   }
 
   count() {
@@ -61,7 +60,6 @@ export default class Timer {
   }
 
   stop() {
-    console.log("Timer stoped");
     clearInterval(this.timer);
   }
 
