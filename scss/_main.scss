@@ -1,13 +1,11 @@
 :root {
   --background-color: rgb(255, 255, 255);
   --text-color: rgb(0, 0, 0);
-  --accent-color: rgb(0, 123, 255);
+  --hover-color: rgb(75, 75, 75);
+  --active-color: rgb(107, 107, 107);
   --border-color: rgb(34, 34, 34);
   --cell-color: rgb(0, 0, 0);
   --disabled-color: rgb(164, 164, 164);
-  --disabled-shadow: 0 0 3px 5px var(--disabled-color);
-  --active-shadow: 0 0 3px 3px var(--text-color);
-  --cell-shadow: 0 0 2px 0.5px var(--text-color);
   --cell-size: 30px;
   --arrow-size: 10px;
   --main-font-size: 24px;
@@ -30,7 +28,8 @@
   &.theme-dark {
     --background-color: rgb(34, 34, 34);
     --text-color: rgb(255, 255, 255);
-    --accent-color: rgb(0, 167, 255);
+    --hover-color: rgb(107, 107, 107);
+    --active-color: rgb(75, 75, 75);
     --border-color: rgb(184, 184, 184);
     --cell-color: rgb(255, 255, 255);
     --active-shadow: 0 0 3px 3px var(--text-color);
@@ -227,7 +226,6 @@
         background-color: var(--cell-color);
         transform: translate(-50%, -50%);
         border-radius: 2px;
-        box-shadow: var(--cell-shadow);
       }
     }
 
@@ -270,23 +268,22 @@
     background-color: var(--text-color);
     color: var(--background-color);
     border: none;
-    box-shadow: 0 0 3px 5px var(--text-color);
-    transition: background-color 0.3s, box-shadow 0.3s;
+    transition: background-color 0.3s, color 0.3s;
+
+    &:hover {
+      color: #ffffff;
+      background-color: var(--hover-color);
+    }
+
+    &:active {
+      background-color: var(--active-color);
+    }
 
     &:disabled {
       cursor: inherit;
       user-select: none;
       background-color: var(--disabled-color);
-      box-shadow: var(--disabled-shadow);
       color: #ffffff;
-
-      &:active {
-        box-shadow: var(--disabled-shadow);
-      }
-    }
-
-    &:active {
-      box-shadow: var(--active-shadow);
     }
   }
 }

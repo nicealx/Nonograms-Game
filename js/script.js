@@ -565,7 +565,7 @@ function continueGame(gameSelectContainer) {
   }
 }
 
-function randomGame(gameSelectContainer, gameLevels) {
+function randomGame(gameSelectContainer, gameDifficulty) {
   if (TIMER_RUN) {
     TIMER.stop();
     TIMER_RUN = false;
@@ -582,8 +582,8 @@ function randomGame(gameSelectContainer, gameLevels) {
   NONOGRAM_SIZE = arrMain[randomSize];
   NONOGRAM_NAME = arrSecond[randomName];
 
-  const currentLevelSelect = gameLevels.children[0].firstChild;
-  const levelsSelectOptions = gameLevels.querySelectorAll(".select__option");
+  const currentLevelSelect = gameDifficulty.children[0].firstChild;
+  const levelsSelectOptions = gameDifficulty.querySelectorAll(".select__option");
 
   Array.from(gameSelectContainer.querySelectorAll(".select__option")).forEach(
     (option) => option.classList.remove("select__option-current")
@@ -599,7 +599,7 @@ function randomGame(gameSelectContainer, gameLevels) {
     sessionSize === arrMain[randomSize] &&
     sessionName === arrSecond[randomName]
   ) {
-    return randomGame(gameSelectContainer, gameLevels);
+    return randomGame(gameSelectContainer, gameDifficulty);
   } else {
     localStorage.setItem("NONOGRAM_SIZE", arrMain[randomSize]);
     localStorage.setItem("NONOGRAM_NAME", arrSecond[randomName]);
@@ -1067,8 +1067,8 @@ function createMainContent() {
 
   const gameContent = createGameSpace(NONOGRAM_SIZE, NONOGRAM_NAME);
   const gameButtonsContainer = createContainer("game__buttons", false);
-  const gameLevels = createSelectDifficulty(gameSelectContainer);
-  const gameStages = createSelectLevels();
+  const gameDifficulty = createSelectDifficulty(gameSelectContainer);
+  const gameLevels = createSelectLevels();
 
   disabledButtons([SAVE_BUTTON, RESET_GAME_BUTTON]);
 
@@ -1088,7 +1088,7 @@ function createMainContent() {
 
   RANDOM_GAME_BUTTON.addEventListener("click", (e) => {
     e.preventDefault();
-    randomGame(gameSelectContainer, gameLevels, gameStages);
+    randomGame(gameSelectContainer, gameDifficulty, gameLevels);
   });
 
   SOLUTION_BUTTON.addEventListener("click", (e) => {
@@ -1101,7 +1101,7 @@ function createMainContent() {
     resetGame();
   });
 
-  gameSelectContainer.append(gameLevels, gameStages);
+  gameSelectContainer.append(gameDifficulty, gameLevels);
   gameTimerBlock.append(MINUTES, SECONDS);
   gameTimer.append(gameTimerBlock);
   GAME_WRAP.append(gameContent);
