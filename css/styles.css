@@ -93,6 +93,10 @@ h2 {
       -ms-flex-align: center;
           align-items: center;
   height: 60px;
+  margin: 20px 0;
+}
+.header__logo {
+  max-width: 40px;
 }
 
 .menu {
@@ -699,6 +703,12 @@ h2 {
   :root {
     --cell-size: 20px;
     --main-font-size: 18px;
+  }
+  .header__content {
+    margin: 10px 0;
+  }
+  .header__logo {
+    max-width: 30px;
   }
   .game__button {
     padding: 5px 10px;

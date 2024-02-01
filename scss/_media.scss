@@ -4,6 +4,15 @@
     --main-font-size: 18px;
   }
 
+  .header {
+    &__content {
+      margin: 10px 0;
+    }
+    &__logo {
+      max-width: 30px;
+    }
+  }
+
   .game {
     &__button {
       padding: 5px 10px;

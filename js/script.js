@@ -20,7 +20,9 @@ const SOUNDS = new Sounds();
 
 const DIFFICULTY = { 5: "Easy", 10: "Medium", 15: "Hard" };
 const GET_THEME = localStorage.getItem("CURRENT_THEME");
-const SOUNDS_STATE = localStorage.getItem("SOUNDS_STATE") ? localStorage.getItem("SOUNDS_STATE") : "on";
+const SOUNDS_STATE = localStorage.getItem("SOUNDS_STATE")
+  ? localStorage.getItem("SOUNDS_STATE")
+  : "on";
 
 const TEMPLATE = {
   5: {
@@ -228,7 +230,7 @@ let CURRENT_THEME = GET_THEME ? GET_THEME : "light";
 let TOUCH_START = -1;
 let TOUCH_END = 0;
 
-localStorage.setItem("CURRENT_THEME", CURRENT_THEME)
+localStorage.setItem("CURRENT_THEME", CURRENT_THEME);
 
 class Link {
   constructor(name, link, classWhere) {
@@ -774,7 +776,7 @@ function createSelectLevels(gameSelectContainer) {
     const target = e.target;
     size = target.dataset.size;
     selectBody.classList.toggle("select__body--show");
-    selectHeader.classList.toggle("select__header--open")
+    selectHeader.classList.toggle("select__header--open");
 
     if (target.classList.contains("select__option")) {
       selectCurrent.textContent = DIFFICULTY[size];
@@ -832,7 +834,7 @@ function createSelectStages(
 
   function selectHandler(e) {
     const target = e.target;
-    selectHeader.classList.toggle("select__header--open")
+    selectHeader.classList.toggle("select__header--open");
     selectBody.classList.toggle("select__body--show");
 
     if (target.classList.contains("select__option")) {
@@ -850,7 +852,7 @@ function createSelectStages(
         TIMER_RUN = false;
       }
       TIMER.reset();
-      disabledButtons(SAVE_BUTTON)
+      disabledButtons(SAVE_BUTTON);
       activatedButtons(SOLUTION_BUTTON);
       renderGame(NONOGRAM_SIZE, NONOGRAM_NAME);
     }
@@ -933,6 +935,74 @@ function createGameSpace(nonogramSize, nonogramName, newMatrix = true) {
   return game;
 }
 
+function createLogo(size) {
+  const logo = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  logo.setAttribute("class", "header__logo");
+  logo.setAttributeNS(null, "viewBox", `0 0 ${size} ${size}`);
+  logo.setAttributeNS(null, "width", 50);
+  logo.setAttributeNS(null, "height", 50);
+  const rectMain = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  
+  rectMain.setAttributeNS(null, "width", size);
+  rectMain.setAttributeNS(null, "height", size);
+  rectMain.setAttributeNS(null, "rx", 5);
+  rectMain.setAttributeNS(null, "ry", 5);
+  rectMain.setAttributeNS(null, "stroke", "#ffffff");
+  rectMain.setAttributeNS(null, "stroke-width", "3px");
+  rectMain.setAttributeNS(null, "fill", "transparent");
+
+  const rectFirst = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  
+  rectFirst.setAttributeNS(null, "width", size / 2);
+  rectFirst.setAttributeNS(null, "height", size / 2);
+  rectFirst.setAttributeNS(null, "x", 0);
+  rectFirst.setAttributeNS(null, "y", 0);
+  rectFirst.setAttributeNS(null, "rx", 5);
+  rectFirst.setAttributeNS(null, "ry", 5);
+  rectFirst.setAttributeNS(null, "stroke", "#ffffff");
+  rectFirst.setAttributeNS(null, "stroke-width", "2px");
+  rectFirst.setAttributeNS(null, "fill", "#ffffff");
+
+  const rectSecond = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  
+  rectSecond.setAttributeNS(null, "width", size / 2);
+  rectSecond.setAttributeNS(null, "height", size / 2);
+  rectSecond.setAttributeNS(null, "x", size / 2);
+  rectSecond.setAttributeNS(null, "y", 0);
+  rectSecond.setAttributeNS(null, "rx", 5);
+  rectSecond.setAttributeNS(null, "ry", 5);
+  rectSecond.setAttributeNS(null, "stroke", "#ffffff");
+  rectSecond.setAttributeNS(null, "stroke-width", "2px");
+  rectSecond.setAttributeNS(null, "fill", "transparent");
+
+  const rectThird = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  
+  rectThird.setAttributeNS(null, "width", size / 2);
+  rectThird.setAttributeNS(null, "height", size / 2);
+  rectThird.setAttributeNS(null, "x", 0);
+  rectThird.setAttributeNS(null, "y", size / 2);
+  rectThird.setAttributeNS(null, "rx", 5);
+  rectThird.setAttributeNS(null, "ry", 5);
+  rectThird.setAttributeNS(null, "stroke", "#ffffff");
+  rectThird.setAttributeNS(null, "stroke-width", "2px");
+  rectThird.setAttributeNS(null, "fill", "transparent");
+
+  const rectFourth = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  
+  rectFourth.setAttributeNS(null, "width", size / 2);
+  rectFourth.setAttributeNS(null, "height", size / 2);
+  rectFourth.setAttributeNS(null, "x", size / 2);
+  rectFourth.setAttributeNS(null, "y", size / 2);
+  rectFourth.setAttributeNS(null, "rx", 5);
+  rectFourth.setAttributeNS(null, "ry", 5);
+  rectFourth.setAttributeNS(null, "stroke", "#ffffff");
+  rectFourth.setAttributeNS(null, "stroke-width", "2px");
+  rectFourth.setAttributeNS(null, "fill", "#ffffff");
+
+  logo.append(rectMain, rectFirst, rectSecond, rectThird, rectFourth);
+  return logo;
+}
+
 function createHeaderContent() {
   const container = createContainer("header__container", true);
   const header = document.createElement("header");
@@ -941,9 +1011,7 @@ function createHeaderContent() {
   const content = document.createElement("div");
   content.className = "header__content";
 
-  const logo = document.createElement("img");
-  logo.className = "header__logo";
-  logo.src = "";
+  const logo = createLogo(50);
 
   const menu = document.createElement("ul");
   menu.className = "header__menu menu";
@@ -967,7 +1035,7 @@ function createHeaderContent() {
   theme.addEventListener("click", themeHandler);
 
   const sound = SOUNDS.init(SOUNDS_STATE);
-  
+
   menu.append(scoreLink, sound, theme);
 
   content.append(logo, menu);
@@ -1042,7 +1110,7 @@ function createMainContent() {
     gameSelectContainer,
     gameButtonsContainer,
     gameTimer,
-    GAME_WRAP,
+    GAME_WRAP
   );
   main.append(GAME_CONTAINER);
 
@@ -1077,12 +1145,12 @@ function createFooterContent() {
 }
 
 function init() {
-  BODY.addEventListener("click", function ({target}) {
+  BODY.addEventListener("click", function ({ target }) {
     const headerLevels = BODY.querySelector(".select__header-levels");
     const headerStages = BODY.querySelector(".select__header-stages");
     const bodyLevels = BODY.querySelector(".select__body-levels");
     const bodyStages = BODY.querySelector(".select__body-stages");
-  
+
     if (
       !target.classList.contains("select__header-levels") &&
       !target.classList.contains("select__current-levels")
@@ -1090,7 +1158,7 @@ function init() {
       bodyLevels.classList.remove("select__body--show");
       headerLevels.classList.remove("select__header--open");
     }
-  
+
     if (
       !target.classList.contains("select__header-stages") &&
       !target.classList.contains("select__current-stages")
@@ -1098,7 +1166,7 @@ function init() {
       bodyStages.classList.remove("select__body--show");
       headerStages.classList.remove("select__header--open");
     }
-  });  
+  });
   BODY.prepend(createFooterContent());
   BODY.prepend(createMainContent(), MODAL_WIN.init(), MODAL_SCORE.init());
   BODY.prepend(createHeaderContent());
