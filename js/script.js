@@ -774,6 +774,7 @@ function createSelectLevels(gameSelectContainer) {
     const target = e.target;
     size = target.dataset.size;
     selectBody.classList.toggle("select__body--show");
+    selectHeader.classList.toggle("select__header--open")
 
     if (target.classList.contains("select__option")) {
       selectCurrent.textContent = DIFFICULTY[size];
@@ -831,6 +832,7 @@ function createSelectStages(
 
   function selectHandler(e) {
     const target = e.target;
+    selectHeader.classList.toggle("select__header--open")
     selectBody.classList.toggle("select__body--show");
 
     if (target.classList.contains("select__option")) {
@@ -855,26 +857,6 @@ function createSelectStages(
   }
 
   selectStages.addEventListener("click", selectHandler);
-
-  GAME_CONTAINER.addEventListener("click", function (e) {
-    const target = e.target;
-    const bodyLevels = GAME_CONTAINER.querySelector(".select__body-levels");
-    const bodyStages = GAME_CONTAINER.querySelector(".select__body-stages");
-
-    if (
-      !target.classList.contains("select__header-levels") &&
-      !target.classList.contains("select__current-levels")
-    ) {
-      bodyLevels.classList.remove("select__body--show");
-    }
-
-    if (
-      !target.classList.contains("select__header-stages") &&
-      !target.classList.contains("select__current-stages")
-    ) {
-      bodyStages.classList.remove("select__body--show");
-    }
-  });
 
   return selectStages;
 }
@@ -1093,6 +1075,33 @@ function createFooterContent() {
 
   return footer;
 }
-BODY.prepend(createFooterContent());
-BODY.prepend(createMainContent(), MODAL_WIN.init(), MODAL_SCORE.init());
-BODY.prepend(createHeaderContent());
+
+function init() {
+  BODY.addEventListener("click", function ({target}) {
+    const headerLevels = BODY.querySelector(".select__header-levels");
+    const headerStages = BODY.querySelector(".select__header-stages");
+    const bodyLevels = BODY.querySelector(".select__body-levels");
+    const bodyStages = BODY.querySelector(".select__body-stages");
+  
+    if (
+      !target.classList.contains("select__header-levels") &&
+      !target.classList.contains("select__current-levels")
+    ) {
+      bodyLevels.classList.remove("select__body--show");
+      headerLevels.classList.remove("select__header--open");
+    }
+  
+    if (
+      !target.classList.contains("select__header-stages") &&
+      !target.classList.contains("select__current-stages")
+    ) {
+      bodyStages.classList.remove("select__body--show");
+      headerStages.classList.remove("select__header--open");
+    }
+  });  
+  BODY.prepend(createFooterContent());
+  BODY.prepend(createMainContent(), MODAL_WIN.init(), MODAL_SCORE.init());
+  BODY.prepend(createHeaderContent());
+}
+
+init();

@@ -9,6 +9,7 @@
   --active-shadow: 0 0 3px 3px var(--text-color);
   --cell-shadow: 0 0 2px 0.5px var(--text-color);
   --cell-size: 30px;
+  --arrow-size: 10px;
   --main-font-size: 24px;
 }
 
@@ -59,6 +60,7 @@ h2 {
     .sounds__on {
       background: url(../icons/on-white.svg);
     }
+
     .sounds__off {
       background: url(../icons/off-white.svg);
     }
@@ -97,7 +99,7 @@ h2 {
 
 .sounds {
   position: relative;
-  
+
   &__label {
     cursor: pointer;
     display: block;
@@ -114,6 +116,7 @@ h2 {
   &__on {
     background: url(../icons/on.svg);
   }
+
   &__off {
     background: url(../icons/off.svg);
   }
@@ -287,21 +290,61 @@ h2 {
 }
 
 .select {
+  $this: &;
   position: relative;
   background-color: var(--background-color);
   width: 150px;
   z-index: 99;
 
   &__header {
+    position: relative;
     cursor: pointer;
     display: flex;
     border: 1px solid var(--border-color);
+
+    &--open {
+      #{$this}__current {
+
+        &::before {
+          transform: translateY(-50%) rotate(-45deg);
+        }
+
+        &::after {
+          transform: translateY(-50%) rotate(45deg);
+        }
+      }
+    }
   }
 
   &__current {
     font-size: 0.8em;
     line-height: 24px;
     padding: 8px;
+    width: 100%;
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: var(--arrow-size);
+      height: 2px;
+      top: 50%;
+      right: calc(var(--arrow-size) * 2 / 1.7);
+      background-color: var(--text-color);
+      transform: translateY(-50%) rotate(45deg);
+      transition: transform 0.3s;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: var(--arrow-size);
+      height: 2px;
+      top: 50%;
+      right: calc(var(--arrow-size) / 1.7);
+      background-color: var(--text-color);
+      transform: translateY(-50%) rotate(-45deg);
+      transition: transform 0.3s;
+    }
   }
 
   &__body {

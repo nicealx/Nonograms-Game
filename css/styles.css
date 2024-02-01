@@ -15,6 +15,7 @@ ul, li {
   --active-shadow: 0 0 3px 3px var(--text-color);
   --cell-shadow: 0 0 2px 0.5px var(--text-color);
   --cell-size: 30px;
+  --arrow-size: 10px;
   --main-font-size: 24px;
 }
 
@@ -332,16 +333,60 @@ h2 {
   z-index: 99;
 }
 .select__header {
+  position: relative;
   cursor: pointer;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   border: 1px solid var(--border-color);
 }
+.select__header--open .select__current::before {
+  -webkit-transform: translateY(-50%) rotate(-45deg);
+      -ms-transform: translateY(-50%) rotate(-45deg);
+          transform: translateY(-50%) rotate(-45deg);
+}
+.select__header--open .select__current::after {
+  -webkit-transform: translateY(-50%) rotate(45deg);
+      -ms-transform: translateY(-50%) rotate(45deg);
+          transform: translateY(-50%) rotate(45deg);
+}
 .select__current {
   font-size: 0.8em;
   line-height: 24px;
   padding: 8px;
+  width: 100%;
+}
+.select__current::before {
+  content: "";
+  position: absolute;
+  width: var(--arrow-size);
+  height: 2px;
+  top: 50%;
+  right: calc(var(--arrow-size) * 2 / 1.7);
+  background-color: var(--text-color);
+  -webkit-transform: translateY(-50%) rotate(45deg);
+      -ms-transform: translateY(-50%) rotate(45deg);
+          transform: translateY(-50%) rotate(45deg);
+  -webkit-transition: -webkit-transform 0.3s;
+  transition: -webkit-transform 0.3s;
+  transition: transform 0.3s;
+  transition: transform 0.3s, -webkit-transform 0.3s;
+}
+.select__current::after {
+  content: "";
+  position: absolute;
+  width: var(--arrow-size);
+  height: 2px;
+  top: 50%;
+  right: calc(var(--arrow-size) / 1.7);
+  background-color: var(--text-color);
+  -webkit-transform: translateY(-50%) rotate(-45deg);
+      -ms-transform: translateY(-50%) rotate(-45deg);
+          transform: translateY(-50%) rotate(-45deg);
+  -webkit-transition: -webkit-transform 0.3s;
+  transition: -webkit-transform 0.3s;
+  transition: transform 0.3s;
+  transition: transform 0.3s, -webkit-transform 0.3s;
 }
 .select__body {
   position: absolute;
@@ -663,6 +708,7 @@ h2 {
   :root {
     --cell-size: 18px;
     --main-font-size: 16px;
+    --arrow-size: 8px;
   }
   .container {
     padding: 0 10px;
