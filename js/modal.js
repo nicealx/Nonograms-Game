@@ -50,7 +50,8 @@ export default class Modal {
   update(title, content, time) {
     this.title.textContent = title;
     if(typeof content === "object") {
-      this.content.replaceWith(this.text.textContent, content);
+      this.content.innerHTML = "";
+      this.content.append(content);
     } else {
       this.text.textContent = content;
       this.time.textContent = time;

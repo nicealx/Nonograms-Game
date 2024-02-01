@@ -465,6 +465,7 @@ function saveScore() {
   });
 
   localStorage.setItem("SAVE_SCORES_GAME", JSON.stringify(SAVE_SCORES_GAME));
+  SAVE_SCORES_GAME = JSON.parse(localStorage.getItem("SAVE_SCORES_GAME"));
 }
 
 function createScoresTable() {
