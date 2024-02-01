@@ -96,6 +96,10 @@ li {
   height: 60px;
   margin: 20px 0;
 }
+.header__logo {
+  width: 40px;
+  height: 40px;
+}
 
 .logo {
   width: 40px;
@@ -720,6 +724,10 @@ li {
     margin: 10px 0 40px 0;
   }
   .header__logo {
+    width: 30px;
+    height: 30px;
+  }
+  .logo {
     width: 30px;
     height: 30px;
   }
