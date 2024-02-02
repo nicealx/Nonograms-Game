@@ -45,7 +45,7 @@ export default class Sounds {
     });
   }
 
-  include(name) {
+  start(name) {
     switch (name) {
       case "cross":
         this.soundsCross.play();
@@ -66,6 +66,15 @@ export default class Sounds {
       default:
         break;
     }
+  }
+
+  stop() {
+    this.soundsCross.pause();
+    this.soundsCross.currentTime = 0;
+    this.soundsEmpty.pause();
+    this.soundsEmpty.currentTime = 0;
+    this.soundsFill.pause();
+    this.soundsFill.currentTime = 0;
   }
 
   soundsOn() {

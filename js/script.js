@@ -338,6 +338,7 @@ function pickHandler(e) {
   const targetTouchEnd = e.type === "touchend";
 
   if (target.classList.contains("game__cell-inner")) {
+    SOUNDS.stop();
     if (targetTouchStart) {
       TOUCH_START = new Date(e.timeStamp).getSeconds();
     }
@@ -355,11 +356,11 @@ function pickHandler(e) {
       }
       if (target.classList.contains("game__cell-fill")) {
         target.classList.toggle("game__cell-fill");
-        SOUNDS.include("empty");
+        SOUNDS.start("empty");
         return deleteMatrixElement(currentCellParent, currentCell);
       } else {
         target.classList.toggle("game__cell-fill");
-        SOUNDS.include("fill");
+        SOUNDS.start("fill");
         answer = 1;
         return addMatrixElement(currentCellParent, currentCell, answer);
       }
@@ -371,17 +372,17 @@ function pickHandler(e) {
       if (target.classList.contains("game__cell-fill")) {
         target.classList.remove("game__cell-fill");
         target.classList.add("game__cell-cross");
-        SOUNDS.include("cross");
+        SOUNDS.start("cross");
         answer = 2;
         return addMatrixElement(currentCellParent, currentCell, answer);
       }
       if (target.classList.contains("game__cell-cross")) {
-        SOUNDS.include("empty");
+        SOUNDS.start("empty");
         target.classList.remove("game__cell-cross");
         answer = 0;
         return addMatrixElement(currentCellParent, currentCell, answer);
       } else {
-        SOUNDS.include("cross");
+        SOUNDS.start("cross");
         target.classList.add("game__cell-cross");
         answer = 2;
         return addMatrixElement(currentCellParent, currentCell, answer);
