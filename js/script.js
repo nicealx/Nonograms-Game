@@ -1,3 +1,4 @@
+import Link from "./link.js";
 import Timer from "./timer.js";
 import Button from "./button.js";
 import Modal from "./modal.js";
@@ -232,25 +233,6 @@ let TOUCH_END = 0;
 
 localStorage.setItem("CURRENT_THEME", CURRENT_THEME);
 
-class Link {
-  constructor(name, link, classWhere) {
-    this.name = name;
-    this.link = link;
-    this.classWhere = classWhere;
-  }
-
-  create() {
-    const li = document.createElement("li");
-    li.className = `${this.classWhere}__item ${this.classWhere}__item-${this.name}`;
-    const a = document.createElement("a");
-    a.className = `${this.classWhere}__link`;
-    a.href = this.link;
-    a.textContent = this.name;
-    li.append(a);
-    return li;
-  }
-}
-
 function formatGameMatrix() {
   return MATRIX.map((cells) => {
     return cells.map((cell) => (cell === 2 ? 0 : cell));
@@ -483,6 +465,8 @@ function createScoresTable() {
 
     const table = document.createElement("table");
     table.className = "scores";
+    const tbody = document.createElement("tbody");
+    tbody.className = "scores__body";
 
     for (let i = 0; i < 1; i++) {
       const tr = document.createElement("tr");
@@ -497,7 +481,7 @@ function createScoresTable() {
         th.textContent = Object.keys(SAVE_SCORES_GAME[i])[j];
         tr.append(th);
       }
-      table.append(tr);
+      tbody.append(tr);
     }
 
     SAVE_SCORES_GAME.forEach((save, i) => {
@@ -517,7 +501,8 @@ function createScoresTable() {
           : save[item];
         tr.append(td);
       });
-      table.append(tr);
+      tbody.append(tr);
+      table.append(tbody);
     });
     MODAL_SCORE.update("Scores", table);
   } else {
