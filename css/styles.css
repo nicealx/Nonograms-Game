@@ -50,6 +50,7 @@ li {
           flex-direction: column;
   gap: 10px;
   min-height: 100vh;
+  margin: 0;
   font-family: "Miriam Libre", sans-serif;
   font-weight: 600;
   font-style: normal;
