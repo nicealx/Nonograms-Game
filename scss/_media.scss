@@ -19,6 +19,12 @@
     width: 30px;
     height: 30px;
   }
+
+  .modal {
+    &__wrap {
+      max-width: 400px;
+    }
+  }
 }
 
 @media screen and (max-width: 500px) {

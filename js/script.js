@@ -247,7 +247,7 @@ function checkWin() {
     TIMER.stop();
     TIMER_RUN = false;
     disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
-    SOUNDS.include("won");
+    SOUNDS.start("won");
     const time = TIMER.current();
     const timeWin = time[0] * 60 + time[1];
 
@@ -452,16 +452,13 @@ function saveScore() {
 }
 
 function createScoresTable() {
+  let scores_arr = [];
   if (SAVE_SCORES_GAME.length !== 0) {
-    SAVE_SCORES_GAME.sort((a, b) => {
+    scores_arr = SAVE_SCORES_GAME.slice(scores_arr.length - 5).sort((a, b) => {
       const f = a["time"][0] * 60 + a["time"][1];
       const s = b["time"][0] * 60 + b["time"][1];
       return f - s;
     });
-
-    if (SAVE_SCORES_GAME.length > 5) {
-      SAVE_SCORES_GAME.splice(5);
-    }
 
     const table = document.createElement("table");
     table.className = "scores";
@@ -475,16 +472,16 @@ function createScoresTable() {
       th.className = "scores__name scores__pos";
       th.textContent = "№";
       tr.append(th);
-      for (let j = 0; j < Object.keys(SAVE_SCORES_GAME[i]).length; j++) {
+      for (let j = 0; j < Object.keys(scores_arr[i]).length; j++) {
         th = document.createElement("th");
         th.className = "scores__name";
-        th.textContent = Object.keys(SAVE_SCORES_GAME[i])[j];
+        th.textContent = Object.keys(scores_arr[i])[j];
         tr.append(th);
       }
       tbody.append(tr);
     }
 
-    SAVE_SCORES_GAME.forEach((save, i) => {
+    scores_arr.forEach((save, i) => {
       const tr = document.createElement("tr");
       tr.className = "scores__row";
       let td = document.createElement("td");
