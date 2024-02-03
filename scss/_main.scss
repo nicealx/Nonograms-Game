@@ -302,7 +302,7 @@
   $this: &;
   position: relative;
   background-color: var(--background-color);
-  width: 150px;
+  width: 180px;
   z-index: 99;
 
   &__header {
@@ -327,7 +327,6 @@
 
   &__current {
     font-size: 0.8em;
-    line-height: 24px;
     padding: 8px;
     width: 100%;
 

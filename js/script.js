@@ -775,9 +775,8 @@ function createSelectDifficulty(gameSelectContainer) {
           el.remove();
         }
       });
-      const firstItem = Object.keys(TEMPLATE[size])[0];
 
-      gameSelectContainer.append(createSelectLevels(size, firstItem));
+      gameSelectContainer.append(createSelectLevels(size, "Select level"));
     }
   }
 
