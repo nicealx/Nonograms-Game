@@ -333,6 +333,8 @@ function pickHandler(e) {
     startGame();
     activatedButtons(RESET_GAME_BUTTON);
     if (button === 0 || (targetTouchEnd && timeTap < 1)) {
+      TOUCH_START = -1;
+      TOUCH_END = 0;
       if (target.classList.contains("game__cell-cross")) {
         target.classList.remove("game__cell-cross");
       }
@@ -346,11 +348,11 @@ function pickHandler(e) {
         answer = 1;
         return addMatrixElement(currentCellParent, currentCell, answer);
       }
-      TOUCH_START = -1;
-      TOUCH_END = 0;
     }
 
     if (button === 2 || (targetTouchEnd && timeTap > 1)) {
+      TOUCH_START = -1;
+      TOUCH_END = 0;
       if (target.classList.contains("game__cell-fill")) {
         target.classList.remove("game__cell-fill");
         target.classList.add("game__cell-cross");
@@ -369,8 +371,6 @@ function pickHandler(e) {
         answer = 2;
         return addMatrixElement(currentCellParent, currentCell, answer);
       }
-      TOUCH_START = -1;
-      TOUCH_END = 0;
     }
   }
 }
