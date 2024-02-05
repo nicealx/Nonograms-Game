@@ -3,7 +3,8 @@
   --text-color: rgb(0, 0, 0);
   --hover-color: rgb(75, 75, 75);
   --active-color: rgb(107, 107, 107);
-  --border-color: rgb(34, 34, 34);
+  --border-color: rgb(0, 0, 0);
+  --border-game-color: rgb(0, 0, 0);
   --cell-color: rgb(0, 0, 0);
   --disabled-color: rgb(164, 164, 164);
   --cell-size: 30px;
@@ -32,7 +33,6 @@
     --hover-color: rgb(107, 107, 107);
     --active-color: rgb(75, 75, 75);
     --border-color: rgb(184, 184, 184);
-    --cell-color: rgb(255, 255, 255);
     --active-shadow: 0 0 3px 3px var(--text-color);
     --cell-shadow: 0 0 2px 0.5px var(--text-color);
 
@@ -171,33 +171,33 @@
   }
 
   &__body {
-    grid-area: body;
+    grid-area: body;    
+    background-color: #fff;
   }
 
   &__cells {
     display: flex;
-    border-left: 2px solid var(--border-color);
-    border-right: 2px solid var(--border-color);
+    border-left: 2px solid var(--border-game-color);
+    border-right: 2px solid var(--border-game-color);
 
     &:first-child {
-      border-top: 2px solid var(--border-color);
+      border-top: 2px solid var(--border-game-color);
     }
 
     &-border {
       .game__cell {
-        border-bottom: 2px solid var(--border-color);
+        border-bottom: 2px solid var(--border-game-color);
       }
 
       &:last-child {
-        border-bottom: 2px solid var(--border-color);
+        border-bottom: 2px solid var(--border-game-color);
       }
     }
   }
 
   &__cell {
     position: relative;
-    border: 0.5px solid var(--border-color);
-    background-color: var(--background-color);
+    border: 0.5px solid var(--border-game-color);
     transition: background-color 0.3s;
 
     &-inner {
@@ -211,7 +211,7 @@
     }
 
     &-border {
-      border-right: 2px solid var(--border-color);
+      border-right: 2px solid var(--border-game-color);
     }
 
     &-fill {
@@ -222,11 +222,10 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 80%;
-        height: 80%;
+        width: 100%;
+        height: 100%;
         background-color: var(--cell-color);
         transform: translate(-50%, -50%);
-        border-radius: 2px;
       }
     }
 
@@ -419,23 +418,24 @@
 
 .clues {
   font-size: 0.7em;
-
+  color: var(--cell-color);
   &__top {
     display: flex;
     flex-direction: row;
-    border-top: 2px solid var(--border-color);
-    border-left: 2px solid var(--border-color);
-    border-right: 2px solid var(--border-color);
+    border-top: 2px solid var(--border-game-color);
+    border-left: 2px solid var(--border-game-color);
+    border-right: 2px solid var(--border-game-color);
+    background-color: #fff;
 
     &-item {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      border: 0.5px solid var(--border-color);
+      border: 0.5px solid var(--border-game-color);
 
       &-border {
-        border-right: 2px solid var(--border-color);
+        border-right: 2px solid var(--border-game-color);
       }
     }
 
@@ -452,19 +452,20 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-top: 2px solid var(--border-color);
-    border-left: 2px solid var(--border-color);
-    border-bottom: 2px solid var(--border-color);
+    border-top: 2px solid var(--border-game-color);
+    border-left: 2px solid var(--border-game-color);
+    border-bottom: 2px solid var(--border-game-color);
+    background-color: #fff;
 
     &-item {
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: flex-end;
-      border: 0.5px solid var(--border-color);
+      border: 0.5px solid var(--border-game-color);
 
       &-border {
-        border-bottom: 2px solid var(--border-color);
+        border-bottom: 2px solid var(--border-game-color);
       }
     }
 
