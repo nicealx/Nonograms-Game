@@ -575,7 +575,7 @@ function randomGame(gameSelectContainer, gameDifficulty) {
   );
 
   Array.from(levelsSelectOptions).forEach((el) => {
-    if (el.dataset.size === arrMain[randomSize]) {
+    if (Number(el.dataset.size) === arrMain[randomSize]) {
       el.classList.add("select__option-current");
     }
   });
@@ -754,6 +754,12 @@ function createSelectDifficulty(gameSelectContainer) {
     selectBody.append(selectGroup);
   }
 
+  Array.from(selectGroup.children).forEach((el) => {
+    if (el.textContent === selectCurrent.textContent) {
+      el.classList.add("select__option-current");
+    }
+  });
+
   selectHeader.append(selectCurrent);
   selectLevels.append(selectHeader, selectBody);
 
@@ -811,6 +817,12 @@ function createSelectLevels(
     selectOption.dataset.size = currentNonogramSize;
     selectGroup.append(selectOption);
   }
+
+  Array.from(selectGroup.children).forEach((el) => {
+    if (el.textContent === selectCurrent.textContent) {
+      el.classList.add("select__option-current");
+    }
+  });
 
   selectBody.append(selectGroup);
   selectHeader.append(selectCurrent);
