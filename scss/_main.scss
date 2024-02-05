@@ -312,7 +312,7 @@
     display: flex;
     border: 1px solid var(--border-color);
 
-    &--open {
+    &_open {
       #{$this}__current {
 
         &::before {
@@ -369,7 +369,7 @@
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
 
-    &--show {
+    &_show {
       opacity: 1;
       visibility: visible;
     }
@@ -387,7 +387,7 @@
       color: var(--background-color)
     }
 
-    &--inactive {
+    &_inactive {
       cursor: inherit;
       background-color: var(--text-color);
 
@@ -489,7 +489,7 @@
   visibility: hidden;
   z-index: 100;
 
-  &--show {
+  &_show {
     opacity: 1;
     visibility: visible;
   }

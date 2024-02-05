@@ -760,8 +760,8 @@ function createSelectDifficulty(gameSelectContainer) {
   function selectHandler(e) {
     const target = e.target;
     size = target.dataset.size;
-    selectBody.classList.toggle("select__body--show");
-    selectHeader.classList.toggle("select__header--open");
+    selectBody.classList.toggle("select__body_show");
+    selectHeader.classList.toggle("select__header_open");
 
     if (target.classList.contains("select__option")) {
       selectCurrent.textContent = DIFFICULTY[size];
@@ -818,13 +818,13 @@ function createSelectLevels(
 
   function selectHandler(e) {
     const target = e.target;
-    selectHeader.classList.toggle("select__header--open");
-    selectBody.classList.toggle("select__body--show");
+    selectHeader.classList.toggle("select__header_open");
+    selectBody.classList.toggle("select__body_show");
 
     if (target.classList.contains("select__option")) {
       NONOGRAM_SIZE = target.dataset.size;
       NONOGRAM_NAME = target.dataset.name;
-      selectBody.classList.remove("select__body--show");
+      selectBody.classList.remove("select__body_show");
       selectCurrent.textContent = NONOGRAM_NAME;
       Array.from(selectBody.querySelectorAll(".select__option")).forEach(
         (option) => option.classList.remove("select__option-current")
@@ -1152,16 +1152,16 @@ function init() {
       !target.classList.contains("select__header-difficulty") &&
       !target.classList.contains("select__current-difficulty")
     ) {
-      bodyLevels.classList.remove("select__body--show");
-      headerLevels.classList.remove("select__header--open");
+      bodyLevels.classList.remove("select__body_show");
+      headerLevels.classList.remove("select__header_open");
     }
 
     if (
       !target.classList.contains("select__header-levels") &&
       !target.classList.contains("select__current-levels")
     ) {
-      bodyStages.classList.remove("select__body--show");
-      headerStages.classList.remove("select__header--open");
+      bodyStages.classList.remove("select__body_show");
+      headerStages.classList.remove("select__header_open");
     }
   });
   BODY.prepend(createFooterContent());

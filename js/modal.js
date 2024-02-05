@@ -59,11 +59,11 @@ export default class Modal {
   }
 
   show() {
-    this.modal.classList.add(`modal--show`);
+    this.modal.classList.add(`modal_show`);
   }
 
   hide() {
-    this.modal.classList.remove(`modal--show`);
+    this.modal.classList.remove(`modal_show`);
   }
 
   clear() {
