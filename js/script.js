@@ -246,7 +246,7 @@ function checkWin() {
     removeBodyListener([pickHandler], true);
     TIMER.stop();
     TIMER_RUN = false;
-    disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
+    disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON, RESET_GAME_BUTTON]);
     SOUNDS.start("won");
     const time = TIMER.current();
     const timeWin = time[0] * 60 + time[1];
@@ -527,6 +527,7 @@ function continueGame(gameSelectContainer) {
   if (check) {
     MATRIX = LOAD_CURRENT_GAME["matrix"];
     TIMER.stop();
+    TIMER_RUN = false;
     TIMER = new Timer(MINUTES, SECONDS, ...LOAD_CURRENT_GAME["currentTimer"]);
     TIMER.update();
     NONOGRAM_NAME = LOAD_CURRENT_GAME["nonogramName"];
@@ -535,9 +536,7 @@ function continueGame(gameSelectContainer) {
 
     fillCells(false);
 
-    Array.from(gameSelectContainer.children).forEach((el) => {
-      el.remove();
-    });
+    gameSelectContainer.innerHTML = "";
     activatedButtons([RESET_GAME_BUTTON, SAVE_BUTTON]);
 
     gameSelectContainer.append(
@@ -550,11 +549,9 @@ function continueGame(gameSelectContainer) {
 }
 
 function randomGame(gameSelectContainer, gameDifficulty) {
-  if (TIMER_RUN) {
-    TIMER.stop();
-    TIMER_RUN = false;
-    TIMER.reset();
-  }
+  TIMER.stop();
+  TIMER_RUN = false;
+  TIMER.reset();
   MATRIX = [];
   const arrMain = Object.keys(TEMPLATE);
   const randomSize = Math.floor(Math.random() * arrMain.length);
@@ -566,9 +563,10 @@ function randomGame(gameSelectContainer, gameDifficulty) {
   NONOGRAM_SIZE = arrMain[randomSize];
   NONOGRAM_NAME = arrSecond[randomName];
 
-  const currentLevelSelect = gameDifficulty.children[0].firstChild;
-  const levelsSelectOptions =
-    gameDifficulty.querySelectorAll(".select__option");
+  const levelsSelect = BODY.querySelector(".select-difficulty");
+
+  const currentLevelSelect = levelsSelect.children[0].firstChild;
+  const levelsSelectOptions = levelsSelect.querySelectorAll(".select__option");
 
   Array.from(gameSelectContainer.querySelectorAll(".select__option")).forEach(
     (option) => option.classList.remove("select__option-current")
@@ -603,11 +601,6 @@ function randomGame(gameSelectContainer, gameDifficulty) {
 }
 
 function resetGame() {
-  if (TIMER_RUN) {
-    TIMER.stop();
-    TIMER_RUN = false;
-  }
-  TIMER.reset();
   Array.from(GAME_WRAP.querySelectorAll(".game__cell-inner")).forEach(
     (cell) => {
       cell.classList.remove("game__cell-fill");
@@ -615,6 +608,7 @@ function resetGame() {
       cell.classList.remove("game__cell-unuse");
     }
   );
+
   addBodyListener([pickHandler, startGame]);
   MATRIX = createMatrix(NONOGRAM_SIZE);
   activatedButtons([SOLUTION_BUTTON]);
