@@ -612,7 +612,6 @@ function resetGame() {
   addBodyListener([pickHandler, startGame]);
   MATRIX = createMatrix(NONOGRAM_SIZE);
   activatedButtons([SOLUTION_BUTTON]);
-  disabledButtons([RESET_GAME_BUTTON]);
 
   return;
 }
