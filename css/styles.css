@@ -32,7 +32,7 @@ li {
   --hover-color: rgb(75, 75, 75);
   --active-color: rgb(107, 107, 107);
   --border-color: rgb(0, 0, 0);
-  --border-game-color: rgb(0, 0, 0);
+  --border-color: rgb(0, 0, 0);
   --cell-color: rgb(0, 0, 0);
   --disabled-color: rgb(164, 164, 164);
   --cell-size: 30px;
@@ -67,6 +67,7 @@ li {
   --hover-color: rgb(107, 107, 107);
   --active-color: rgb(75, 75, 75);
   --border-color: rgb(184, 184, 184);
+  --cell-color: rgb(255, 255, 255);
   --active-shadow: 0 0 3px 3px var(--text-color);
   --cell-shadow: 0 0 2px 0.5px var(--text-color);
 }
@@ -227,27 +228,26 @@ li {
 }
 .game__body {
   grid-area: body;
-  background-color: #fff;
 }
 .game__cells {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  border-left: 2px solid var(--border-game-color);
-  border-right: 2px solid var(--border-game-color);
+  border-left: 2px solid var(--border-color);
+  border-right: 2px solid var(--border-color);
 }
 .game__cells:first-child {
-  border-top: 2px solid var(--border-game-color);
+  border-top: 2px solid var(--border-color);
 }
 .game__cells-border .game__cell {
-  border-bottom: 2px solid var(--border-game-color);
+  border-bottom: 2px solid var(--border-color);
 }
 .game__cells-border:last-child {
-  border-bottom: 2px solid var(--border-game-color);
+  border-bottom: 2px solid var(--border-color);
 }
 .game__cell {
   position: relative;
-  border: 0.5px solid var(--border-game-color);
+  border: 0.5px solid var(--border-color);
   -webkit-transition: background-color 0.3s;
   transition: background-color 0.3s;
 }
@@ -260,7 +260,7 @@ li {
   cursor: inherit;
 }
 .game__cell-border {
-  border-right: 2px solid var(--border-game-color);
+  border-right: 2px solid var(--border-color);
 }
 .game__cell-fill {
   position: relative;
@@ -270,12 +270,13 @@ li {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100%;
-  height: 100%;
+  width: 85%;
+  height: 85%;
   background-color: var(--cell-color);
   -webkit-transform: translate(-50%, -50%);
       -ms-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
+  border-radius: 3px;
 }
 .game__cell-cross::before, .game__cell-cross::after {
   content: "";
@@ -478,7 +479,7 @@ li {
 
 .clues {
   font-size: 0.7em;
-  color: var(--cell-color);
+  color: var(--text-color);
 }
 .clues__top {
   display: -webkit-box;
@@ -488,10 +489,9 @@ li {
   -webkit-box-direction: normal;
       -ms-flex-direction: row;
           flex-direction: row;
-  border-top: 2px solid var(--border-game-color);
-  border-left: 2px solid var(--border-game-color);
-  border-right: 2px solid var(--border-game-color);
-  background-color: #fff;
+  border-top: 2px solid var(--border-color);
+  border-left: 2px solid var(--border-color);
+  border-right: 2px solid var(--border-color);
 }
 .clues__top-item {
   display: -webkit-box;
@@ -507,10 +507,10 @@ li {
   -webkit-box-pack: end;
       -ms-flex-pack: end;
           justify-content: flex-end;
-  border: 0.5px solid var(--border-game-color);
+  border: 0.5px solid var(--border-color);
 }
 .clues__top-item-border {
-  border-right: 2px solid var(--border-game-color);
+  border-right: 2px solid var(--border-color);
 }
 .clues__top-num {
   display: -webkit-box;
@@ -536,10 +536,9 @@ li {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  border-top: 2px solid var(--border-game-color);
-  border-left: 2px solid var(--border-game-color);
-  border-bottom: 2px solid var(--border-game-color);
-  background-color: #fff;
+  border-top: 2px solid var(--border-color);
+  border-left: 2px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
 }
 .clues__left-item {
   display: -webkit-box;
@@ -555,10 +554,10 @@ li {
   -webkit-box-pack: end;
       -ms-flex-pack: end;
           justify-content: flex-end;
-  border: 0.5px solid var(--border-game-color);
+  border: 0.5px solid var(--border-color);
 }
 .clues__left-item-border {
-  border-bottom: 2px solid var(--border-game-color);
+  border-bottom: 2px solid var(--border-color);
 }
 .clues__left-num {
   display: -webkit-box;
