@@ -375,6 +375,34 @@ function pickHandler(e) {
   }
 }
 
+function hoverHandler({target}) {
+  if(target.classList.contains("game__cell")) {
+    let cellID = target.dataset.cell;
+    target.parentNode.classList.add("highlight")
+    Array.from(target.parentNode.parentNode.children).forEach((row) => {
+      Array.from(row.children).forEach((cell) => {
+        if (cell.dataset.cell === cellID) {
+          cell.classList.add("highlight")
+        }
+      })
+    })
+    target.classList.add("highlight")
+  }
+}
+
+function hoverRemoveHandler({target}) {  
+    let cellID = target.dataset.cell;
+    target.parentNode.classList.remove("highlight")
+    Array.from(target.parentNode.parentNode.children).forEach((row) => {
+      Array.from(row.children).forEach((cell) => {
+        if (cell.dataset.cell === cellID) {
+          cell.classList.remove("highlight")
+        }
+      })
+    })
+    target.classList.remove("highlight")
+}
+
 function themeHandler(e) {
   e.preventDefault();
   CURRENT_THEME = localStorage.getItem("CURRENT_THEME");
@@ -889,12 +917,16 @@ function createPlace() {
       const cell = document.createElement("div");
       const cellInner = document.createElement("div");
       cell.className = "game__cell";
+      cell.dataset.cell = j;
       cellInner.className = "game__cell-inner";
       cellInner.dataset.cell = j;
       if ((j + 1) % 5 === 0) {
         cell.classList.add("game__cell-border");
       }
       cell.append(cellInner);
+      
+      cell.addEventListener("mouseenter", hoverHandler);
+      cell.addEventListener("mouseleave", hoverRemoveHandler);
       div.append(cell);
     });
     BODY_GAME.append(div);
