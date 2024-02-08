@@ -654,6 +654,7 @@ function showSolution() {
   activatedButtons(RESET_GAME_BUTTON);
   fillCells();
   removeBodyListener([pickHandler, startGame], false);
+
 }
 
 function createContainer(containerClass = "", need) {
