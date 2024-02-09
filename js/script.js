@@ -228,14 +228,33 @@ let LOAD_CURRENT_GAME = JSON.parse(localStorage.getItem("SAVE_CURRENT_GAME"));
 let LOAD_SCORE_GAME = JSON.parse(localStorage.getItem("SAVE_SCORES_GAME"));
 let SAVE_SCORES_GAME = LOAD_SCORE_GAME ? LOAD_SCORE_GAME : [];
 let CURRENT_THEME = GET_THEME ? GET_THEME : "light";
-let TOUCH_START = -1;
-let TOUCH_END = 0;
 
 localStorage.setItem("CURRENT_THEME", CURRENT_THEME);
 
 function formatGameMatrix() {
   return MATRIX.map((cells) => {
     return cells.map((cell) => (cell === 2 ? 0 : cell));
+  });
+}
+
+function setUnUseCells() {
+  const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
+  gameCellsList.forEach((cells) => {
+    Array.from(cells.children).forEach((cell) => {
+      cell.firstChild.classList.add("game__cell-unuse");
+      cell.removeEventListener("mouseenter", hoverHandler);
+      cell.removeEventListener("mouseleave", hoverRemoveHandler);
+    });
+  });
+}
+
+function setUseCells() {
+  const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
+  gameCellsList.forEach((cells) => {
+    Array.from(cells.children).forEach((cell) => {
+      cell.addEventListener("mouseenter", hoverHandler);
+      cell.addEventListener("mouseleave", hoverRemoveHandler);
+    });
   });
 }
 
@@ -257,13 +276,7 @@ function checkWin() {
       `${timeWin} seconds`
     );
     MODAL_WIN.show();
-
-    const gameCellsList = GAME_WRAP.querySelectorAll(".game__cells");
-    gameCellsList.forEach((cells) => {
-      Array.from(cells.children).forEach((cell) => {
-        cell.firstChild.classList.add("game__cell-unuse");
-      });
-    });
+    setUnUseCells();
   }
 }
 
@@ -316,25 +329,13 @@ function pickHandler(e) {
   const currentCell = target.dataset.cell;
   const currentCellParent = target.parentNode.parentNode.dataset.cells;
   let answer = 0;
-  const targetTouchStart = e.type === "touchstart";
-  const targetTouchEnd = e.type === "touchend";
 
   if (target.classList.contains("game__cell-inner")) {
     SOUNDS.stop();
-    if (targetTouchStart) {
-      TOUCH_START = new Date(e.timeStamp).getSeconds();
-    }
 
-    if (targetTouchEnd) {
-      TOUCH_END = new Date(e.timeStamp).getSeconds();
-    }
-
-    let timeTap = TOUCH_END - TOUCH_START;
     startGame();
     activatedButtons(RESET_GAME_BUTTON);
-    if (button === 0 || (targetTouchEnd && timeTap < 1)) {
-      TOUCH_START = -1;
-      TOUCH_END = 0;
+    if (button === 0) {
       if (target.classList.contains("game__cell-cross")) {
         target.classList.remove("game__cell-cross");
       }
@@ -348,11 +349,7 @@ function pickHandler(e) {
         answer = 1;
         return addMatrixElement(currentCellParent, currentCell, answer);
       }
-    }
-
-    if (button === 2 || (targetTouchEnd && timeTap > 1)) {
-      TOUCH_START = -1;
-      TOUCH_END = 0;
+    } else {
       if (target.classList.contains("game__cell-fill")) {
         target.classList.remove("game__cell-fill");
         target.classList.add("game__cell-cross");
@@ -375,32 +372,32 @@ function pickHandler(e) {
   }
 }
 
-function hoverHandler({target}) {
-  if(target.classList.contains("game__cell")) {
+function hoverHandler({ target }) {
+  if (target.classList.contains("game__cell")) {
     let cellID = target.dataset.cell;
-    target.parentNode.classList.add("highlight")
+    target.parentNode.classList.add("highlight");
     Array.from(target.parentNode.parentNode.children).forEach((row) => {
       Array.from(row.children).forEach((cell) => {
         if (cell.dataset.cell === cellID) {
-          cell.classList.add("highlight")
+          cell.classList.add("highlight");
         }
-      })
-    })
-    target.classList.add("highlight")
+      });
+    });
+    target.classList.add("highlight");
   }
 }
 
-function hoverRemoveHandler({target}) {  
-    let cellID = target.dataset.cell;
-    target.parentNode.classList.remove("highlight")
-    Array.from(target.parentNode.parentNode.children).forEach((row) => {
-      Array.from(row.children).forEach((cell) => {
-        if (cell.dataset.cell === cellID) {
-          cell.classList.remove("highlight")
-        }
-      })
-    })
-    target.classList.remove("highlight")
+function hoverRemoveHandler({ target }) {
+  let cellID = target.dataset.cell;
+  target.parentNode.classList.remove("highlight");
+  Array.from(target.parentNode.parentNode.children).forEach((row) => {
+    Array.from(row.children).forEach((cell) => {
+      if (cell.dataset.cell === cellID) {
+        cell.classList.remove("highlight");
+      }
+    });
+  });
+  target.classList.remove("highlight");
 }
 
 function themeHandler(e) {
@@ -432,8 +429,6 @@ function addBodyListener(callbacks) {
   callbacks.forEach((callback) => {
     BODY_GAME.addEventListener("click", callback);
     BODY_GAME.addEventListener("contextmenu", callback);
-    BODY_GAME.addEventListener("touchstart", callback);
-    BODY_GAME.addEventListener("touchend", callback);
   });
 }
 
@@ -441,8 +436,6 @@ function removeBodyListener(callbacks, contextmenu = false) {
   callbacks.forEach((callback) => {
     BODY_GAME.removeEventListener("click", callback);
     BODY_GAME.removeEventListener("contextmenu", callback);
-    BODY_GAME.removeEventListener("touchstart", callback);
-    BODY_GAME.removeEventListener("touchend", callback);
   });
 
   if (contextmenu) {
@@ -637,6 +630,7 @@ function resetGame() {
     }
   );
 
+  setUseCells();
   addBodyListener([pickHandler, startGame]);
   MATRIX = createMatrix(NONOGRAM_SIZE);
   activatedButtons([SOLUTION_BUTTON]);
@@ -653,8 +647,8 @@ function showSolution() {
   disabledButtons([SAVE_BUTTON, SOLUTION_BUTTON]);
   activatedButtons(RESET_GAME_BUTTON);
   fillCells();
+  setUnUseCells();
   removeBodyListener([pickHandler, startGame], false);
-
 }
 
 function createContainer(containerClass = "", need) {
@@ -925,7 +919,7 @@ function createPlace() {
         cell.classList.add("game__cell-border");
       }
       cell.append(cellInner);
-      
+
       cell.addEventListener("mouseenter", hoverHandler);
       cell.addEventListener("mouseleave", hoverRemoveHandler);
       div.append(cell);

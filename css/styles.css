@@ -80,10 +80,6 @@ li {
   background: url(../icons/off-white.svg);
 }
 
-.highlight {
-  background-color: var(--hover-cell-color);
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -348,10 +344,6 @@ li {
   border: none;
   -webkit-transition: background-color 0.3s, color 0.3s;
   transition: background-color 0.3s, color 0.3s;
-}
-.game__button:hover {
-  color: #ffffff;
-  background-color: var(--hover-color);
 }
 .game__button:active {
   background-color: var(--active-color);
@@ -735,6 +727,15 @@ li {
   font-size: 0.8em;
 }
 
+@media (hover: hover) {
+  .highlight {
+    background-color: var(--hover-cell-color);
+  }
+  .game__button:hover {
+    color: #ffffff;
+    background-color: var(--hover-color);
+  }
+}
 @media screen and (max-width: 700px) {
   :root {
     --cell-size: 20px;

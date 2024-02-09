@@ -49,10 +49,6 @@
   }
 }
 
-.highlight {
-  background-color: var(--hover-cell-color);
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -287,11 +283,6 @@
     color: var(--background-color);
     border: none;
     transition: background-color 0.3s, color 0.3s;
-
-    &:hover {
-      color: #ffffff;
-      background-color: var(--hover-color);
-    }
 
     &:active {
       background-color: var(--active-color);
