@@ -357,6 +357,10 @@ li {
   background-color: var(--disabled-color);
   color: #ffffff;
 }
+.game__button:disabled:hover {
+  color: #ffffff;
+  background-color: var(--disabled-color);
+}
 
 .select {
   position: relative;

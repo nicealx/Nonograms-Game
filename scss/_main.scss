@@ -293,6 +293,10 @@
       user-select: none;
       background-color: var(--disabled-color);
       color: #ffffff;
+      &:hover {
+        color: #ffffff;
+        background-color: var(--disabled-color);
+      }
     }
   }
 }
